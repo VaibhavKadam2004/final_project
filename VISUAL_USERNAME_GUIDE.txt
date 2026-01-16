@@ -1,0 +1,164 @@
+```
+╔════════════════════════════════════════════════════════════════════════════╗
+║                                                                            ║
+║          🔑 WHAT IS "YOUR_USERNAME" AND HOW TO REPLACE IT 🔑              ║
+║                                                                            ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+
+❓ WHAT DOES "YOUR_USERNAME" MEAN?
+════════════════════════════════════════════════════════════════════════════
+
+It's a PLACEHOLDER - meaning you must replace it with your actual
+GitHub username.
+
+Think of it like a template:
+  Template: "Hello [YOUR_NAME], welcome!"
+  Real:     "Hello Vaibhav, welcome!"
+
+Same with YOUR_USERNAME:
+  Template: https://github.com/YOUR_USERNAME/placement-portal.git
+  Real:     https://github.com/vaibhav123/placement-portal.git
+                                ↑
+                         REPLACE THIS
+
+
+📍 STEP 1: FIND YOUR GITHUB USERNAME
+════════════════════════════════════════════════════════════════════════════
+
+Go to: https://github.com
+
+Look for the text after @ symbol on your profile
+
+Example:
+  You see: @VaibhavKadam2004
+  
+  Your username is: VaibhavKadam2004
+
+
+🔄 STEP 2: REPLACE IN THE COMMAND
+════════════════════════════════════════════════════════════════════════════
+
+ORIGINAL (Template):
+  git remote add origin https://github.com/YOUR_USERNAME/placement-portal.git
+
+What you do:
+  1. Delete the words "YOUR_USERNAME"
+  2. Type your actual GitHub username
+  3. Leave everything else the same
+
+
+📝 EXAMPLE (If your username is: myusername)
+════════════════════════════════════════════════════════════════════════════
+
+BEFORE (Wrong - don't use):
+  git remote add origin https://github.com/YOUR_USERNAME/placement-portal.git
+
+AFTER (Correct - use this):
+  git remote add origin https://github.com/myusername/placement-portal.git
+                                           ↑ Only this changed
+
+
+💻 REAL EXAMPLES
+════════════════════════════════════════════════════════════════════════════
+
+Example 1: Username is "john_developer"
+  ✅ CORRECT: git remote add origin https://github.com/john_developer/placement-portal.git
+  ❌ WRONG: git remote add origin https://github.com/YOUR_USERNAME/placement-portal.git
+
+Example 2: Username is "sarah_coder"
+  ✅ CORRECT: git remote add origin https://github.com/sarah_coder/placement-portal.git
+  ❌ WRONG: git remote add origin https://github.com/YOUR_USERNAME/placement-portal.git
+
+Example 3: Username is "VaibhavKadam2004"
+  ✅ CORRECT: git remote add origin https://github.com/VaibhavKadam2004/placement-portal.git
+  ❌ WRONG: git remote add origin https://github.com/YOUR_USERNAME/placement-portal.git
+
+
+✅ STEP 3: RUN THE COMMAND
+════════════════════════════════════════════════════════════════════════════
+
+1. Open PowerShell in your project
+2. Copy your command (with YOUR_USERNAME replaced)
+3. Paste it: Ctrl + V
+4. Press Enter
+5. Done!
+
+
+🔍 HOW TO VERIFY YOU DID IT RIGHT
+════════════════════════════════════════════════════════════════════════════
+
+Run this command:
+  git remote -v
+
+You should see your actual username, like:
+  origin  https://github.com/john_developer/placement-portal.git (fetch)
+  origin  https://github.com/john_developer/placement-portal.git (push)
+
+NOT like this (this is WRONG):
+  origin  https://github.com/YOUR_USERNAME/placement-portal.git (fetch)
+
+
+⚠️  IMPORTANT RULES
+════════════════════════════════════════════════════════════════════════════
+
+✅ DO:
+  • Replace ONLY the words "YOUR_USERNAME"
+  • Keep "/placement-portal.git" the same
+  • Match your username exactly (case matters!)
+  • Remove spaces if any
+  • Use only letters, numbers, hyphens, underscores
+
+❌ DON'T:
+  • Replace the entire URL
+  • Keep the words "YOUR_USERNAME"
+  • Add brackets like [YOUR_USERNAME]
+  • Add @ symbol
+  • Add spaces
+  • Forget the .git at the end
+
+
+🎯 TEMPLATE TO FILL OUT
+════════════════════════════════════════════════════════════════════════════
+
+My GitHub username is:  _____________________
+
+My command is:
+  git remote add origin https://github.com/_____________________/placement-portal.git
+
+
+🚀 COMPLETE 3-COMMAND SEQUENCE
+════════════════════════════════════════════════════════════════════════════
+
+Copy & paste these commands one by one (replace YOUR_USERNAME):
+
+Command 1:
+  git remote remove origin
+
+Command 2 (REPLACE YOUR_USERNAME):
+  git remote add origin https://github.com/YOUR_USERNAME/placement-portal.git
+
+Command 3:
+  git push -u origin main
+
+
+💡 VISUAL BREAKDOWN
+════════════════════════════════════════════════════════════════════════════
+
+The complete URL structure:
+
+  https://github.com/YOUR_USERNAME/placement-portal.git
+           ├─────────────────────────────────────────────┤
+           │         This is the GitHub URL              │
+           ├─────┬──────────────────┬──────────┬─────────┤
+           │     │                  │          │         │
+        github  username          repo      .git
+
+
+════════════════════════════════════════════════════════════════════════════
+
+✨ REMEMBER: YOUR_USERNAME is just a placeholder!
+   Replace it with your ACTUAL GitHub username and you're done!
+
+════════════════════════════════════════════════════════════════════════════
+```
