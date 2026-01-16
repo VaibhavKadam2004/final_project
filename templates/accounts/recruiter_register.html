@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Recruiter Registration - Smart Placement Portal{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card shadow">
+                <div class="card-body p-5">
+                    <!-- Header -->
+                    <div style="text-align: center; margin-bottom: 30px;">
+                        <h2 style="font-weight: 700; color: #0b2545; margin-bottom: 10px;">
+                            <i class="fas fa-building"></i> Recruiter Registration
+                        </h2>
+                        <p style="color: #6b7280; margin-bottom: 0;">Create your company profile and start hiring</p>
+                    </div>
+
+                    <!-- Messages -->
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                <i class="fas fa-{% if message.tags %}check{% else %}exclamation{% endif %}-circle"></i> {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <!-- Registration Form -->
+                    <form method="POST" action="">
+                        {% csrf_token %}
+
+                        <!-- Section: Account Details -->
+                        <div style="background: #f3f4f6; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                            <h5 style="color: #0b2545; font-weight: 600; margin-bottom: 15px;">
+                                <i class="fas fa-user"></i> Account Details
+                            </h5>
+
+                            <div class="mb-3">
+                                <label for="username" class="form-label" style="font-weight: 500;">
+                                    Username <span style="color: #ef4444;">*</span>
+                                </label>
+                                <input type="text" class="form-control" id="username" name="username" 
+                                       placeholder="Enter your username" required>
+                                <small class="text-muted">Unique identifier for your account</small>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="email" class="form-label" style="font-weight: 500;">
+                                    Personal Email <span style="color: #ef4444;">*</span>
+                                </label>
+                                <input type="email" class="form-control" id="email" name="email" 
+                                       placeholder="your.email@example.com" required>
+                                <small class="text-muted">For account recovery and notifications</small>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="password" class="form-label" style="font-weight: 500;">
+                                    Password <span style="color: #ef4444;">*</span>
+                                </label>
+                                <input type="password" class="form-control" id="password" name="password" 
+                                       placeholder="Enter a strong password" required>
+                                <small class="text-muted">Minimum 8 characters with numbers and special characters</small>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="password2" class="form-label" style="font-weight: 500;">
+                                    Confirm Password <span style="color: #ef4444;">*</span>
+                                </label>
+                                <input type="password" class="form-control" id="password2" name="password2" 
+                                       placeholder="Confirm your password" required>
+                            </div>
+                        </div>
+
+                        <!-- Section: Company Details -->
+                        <div style="background: #f3f4f6; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                            <h5 style="color: #0b2545; font-weight: 600; margin-bottom: 15px;">
+                                <i class="fas fa-briefcase"></i> Company Details
+                            </h5>
+
+                            <div class="mb-3">
+                                <label for="company_name" class="form-label" style="font-weight: 500;">
+                                    Company Name <span style="color: #ef4444;">*</span>
+                                </label>
+                                <input type="text" class="form-control" id="company_name" name="company_name" 
+                                       placeholder="e.g., Tech Solutions Inc." required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="company_email" class="form-label" style="font-weight: 500;">
+                                    Company Email <span style="color: #ef4444;">*</span>
+                                </label>
+                                <input type="email" class="form-control" id="company_email" name="company_email" 
+                                       placeholder="hr@company.com" required>
+                                <small class="text-muted">Official company email for HR communications</small>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="company_website" class="form-label" style="font-weight: 500;">
+                                    Company Website
+                                </label>
+                                <input type="url" class="form-control" id="company_website" name="company_website" 
+                                       placeholder="https://www.company.com">
+                                <small class="text-muted">Optional - Your company's official website</small>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="contact_phone" class="form-label" style="font-weight: 500;">
+                                    Contact Phone
+                                </label>
+                                <input type="tel" class="form-control" id="contact_phone" name="contact_phone" 
+                                       placeholder="+91-XXXXXXXXXX">
+                                <small class="text-muted">Optional - For official company contact</small>
+                            </div>
+                        </div>
+
+                        <!-- Terms & Conditions -->
+                        <div class="form-check mb-3">
+                            <input type="checkbox" class="form-check-input" id="terms" required>
+                            <label class="form-check-label" for="terms" style="font-size: 13px;">
+                                I agree to the <a href="#" style="color: #0b2545; text-decoration: none;">Terms & Conditions</a> 
+                                and <a href="#" style="color: #0b2545; text-decoration: none;">Privacy Policy</a>
+                            </label>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="btn btn-primary w-100" style="padding: 10px; font-weight: 600; border-radius: 8px;">
+                            <i class="fas fa-user-plus"></i> Create Recruiter Account
+                        </button>
+                    </form>
+
+                    <!-- Login Link -->
+                    <div style="text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+                        <p style="color: #6b7280; margin-bottom: 0;">
+                            Already have an account? 
+                            <a href="{% url 'login' %}" style="color: #0b2545; font-weight: 600; text-decoration: none;">
+                                Login here
+                            </a>
+                        </p>
+                    </div>
+
+                    <!-- Info Box -->
+                    <div style="background: #dbeafe; border-left: 4px solid #3b82f6; padding: 15px; border-radius: 6px; margin-top: 20px;">
+                        <p style="color: #1e40af; font-size: 13px; margin-bottom: 8px;">
+                            <i class="fas fa-info-circle"></i> <strong>What happens after registration?</strong>
+                        </p>
+                        <ol style="color: #1e40af; font-size: 13px; margin-bottom: 0; padding-left: 20px;">
+                            <li>Your company profile will be created</li>
+                            <li>TPO will review and approve your company</li>
+                            <li>Once approved, you can post jobs and manage applications</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-control:focus {
+        border-color: #0b2545;
+        box-shadow: 0 0 0 0.2rem rgba(11, 37, 69, 0.25);
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #0b2545 0%, #1e40af 100%);
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(11, 37, 69, 0.3);
+    }
+
+    .card {
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+</style>
+{% endblock %}

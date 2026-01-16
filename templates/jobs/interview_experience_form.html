@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+
+{% block title %}Share Interview Experience{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8 mx-auto">
+            <h2>✍️ Share Your Interview Experience</h2>
+            <p class="text-muted">Help other students by sharing what you learned. Your experience will be reviewed by TPO before being published.</p>
+            <hr>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <form method="POST">
+                {% csrf_token %}
+
+                <!-- Company & Job Info -->
+                <div class="card mb-3">
+                    <div class="card-header bg-primary text-white">
+                        <h5>🏢 Company & Job Details</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="company"><strong>Company Name</strong></label>
+                            <input type="text" class="form-control" id="company" name="company" placeholder="e.g., Google, Amazon, etc." required>
+                        </div>
+                        <div class="form-group">
+                            <label for="job_title"><strong>Job Title</strong></label>
+                            <input type="text" class="form-control" id="job_title" name="job_title" placeholder="e.g., Software Engineer, Product Manager" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Round Details -->
+                <div class="card mb-3">
+                    <div class="card-header bg-primary text-white">
+                        <h5>📋 Interview Round Details</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="round_number"><strong>Round Number</strong></label>
+                                <input type="number" class="form-control" id="round_number" name="round_number" min="1" value="1" required>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="round_type"><strong>Round Type</strong></label>
+                                <select class="form-control" id="round_type" name="round_type" required>
+                                    <option value="">-- Select --</option>
+                                    {% for choice in round_types %}
+                                        <option value="{{ choice.0 }}">{{ choice.1 }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="duration_minutes"><strong>Duration (minutes)</strong></label>
+                                <input type="number" class="form-control" id="duration_minutes" name="duration_minutes" min="15" value="60" required>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="difficulty"><strong>Difficulty Level</strong></label>
+                                <select class="form-control" id="difficulty" name="difficulty" required>
+                                    {% for choice in difficulties %}
+                                        <option value="{{ choice.0 }}">{{ choice.1 }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Questions & Experience -->
+                <div class="card mb-3">
+                    <div class="card-header bg-primary text-white">
+                        <h5>📝 Your Interview Details</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="questions_asked"><strong>Questions Asked</strong></label>
+                            <small class="form-text text-muted">List each question on a new line</small>
+                            <textarea class="form-control" id="questions_asked" name="questions_asked" rows="5" placeholder="1. Question about...\n2. Question about..." required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="your_experience"><strong>Your Experience</strong></label>
+                            <small class="form-text text-muted">Tell us what you discussed, how you solved problems, and any challenges you faced</small>
+                            <textarea class="form-control" id="your_experience" name="your_experience" rows="5" placeholder="Share your experience in detail..." required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="tips_for_others"><strong>Tips for Future Candidates</strong></label>
+                            <small class="form-text text-muted">What advice would you give to someone preparing for this round?</small>
+                            <textarea class="form-control" id="tips_for_others" name="tips_for_others" rows="5" placeholder="Share tips, resources, and preparation strategies..." required></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Result -->
+                <div class="card mb-3">
+                    <div class="card-header bg-primary text-white">
+                        <h5>✅ Result</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="selected_after" name="selected_after" value="on">
+                            <label class="form-check-label" for="selected_after">
+                                <strong>I was selected / moved to the next round after this</strong>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submission Info -->
+                <div class="alert alert-info" role="alert">
+                    <h5>ℹ️ Before You Submit</h5>
+                    <ul>
+                        <li>Make sure your experience is accurate and helpful</li>
+                        <li>Avoid including sensitive company information</li>
+                        <li>Your submission will be reviewed by TPO before publishing</li>
+                        <li>Once approved, all students can view and learn from your experience</li>
+                    </ul>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success btn-lg btn-block">
+                        ✍️ Submit Experience
+                    </button>
+                </div>
+                <div class="form-group">
+                    <a href="{% url 'prep_vault' %}" class="btn btn-secondary btn-block">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

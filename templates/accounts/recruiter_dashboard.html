@@ -1,0 +1,237 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Recruiter Dashboard - Job Management{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h2 style="font-weight: 700; color: #0b2545; margin: 0;">
+                        <i class="fas fa-briefcase"></i> Welcome, {{ user.first_name|default:user.username }}
+                    </h2>
+                    <p style="color: #6b7280; margin-top: 5px;">Manage your job postings and candidate applications</p>
+                </div>
+                <div>
+                    <button class="btn btn-primary" onclick="location.href='{% url 'job_create' %}'">
+                        <i class="fas fa-plus-circle"></i> Post New Job
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Company Status Card -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 style="color: #0b2545; font-weight: 600; margin-bottom: 15px;">
+                                <i class="fas fa-building"></i> Company Information
+                            </h5>
+                            <div>
+                                {% if recruiter_profile %}
+                                    <p style="font-size: 12px; color: #6b7280; margin-bottom: 3px;">Company Name</p>
+                                    <p style="font-size: 16px; font-weight: 600; color: #0b2545; margin-bottom: 10px;">{{ recruiter_profile.company_name }}</p>
+                                    <p style="font-size: 12px; color: #6b7280; margin-bottom: 3px;">Company Email</p>
+                                    <p style="font-size: 14px; color: #0b2545; margin-bottom: 10px;">{{ recruiter_profile.company_email }}</p>
+                                    {% if recruiter_profile.company_website %}
+                                        <p style="font-size: 12px; color: #6b7280; margin-bottom: 3px;">Website</p>
+                                        <p style="font-size: 14px; color: #1e40af; margin-bottom: 10px;">
+                                            <a href="{{ recruiter_profile.company_website }}" target="_blank">{{ recruiter_profile.company_website }}</a>
+                                        </p>
+                                    {% endif %}
+                                {% else %}
+                                    <p style="color: #6b7280;">No company profile found</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 style="color: #0b2545; font-weight: 600; margin-bottom: 15px;">
+                                <i class="fas fa-check-circle"></i> Approval Status
+                            </h5>
+                            <div style="padding: 15px; background: #f3f4f6; border-radius: 8px;">
+                                {% if recruiter_profile and recruiter_profile.is_approved %}
+                                    <div style="display: flex; align-items: center; gap: 10px; color: #10b981;">
+                                        <i class="fas fa-check-circle" style="font-size: 20px;"></i>
+                                        <div>
+                                            <p style="font-weight: 600; margin: 0;">Profile Approved</p>
+                                            <p style="font-size: 12px; color: #059669; margin: 0;">You can now post jobs</p>
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <div style="display: flex; align-items: center; gap: 10px; color: #f59e0b;">
+                                        <i class="fas fa-hourglass-half" style="font-size: 20px;"></i>
+                                        <div>
+                                            <p style="font-weight: 600; margin: 0;">Pending Approval</p>
+                                            <p style="font-size: 12px; color: #d97706; margin: 0;">Your profile is awaiting TPO approval</p>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                {% if recruiter_profile and recruiter_profile.is_blocked %}
+                                    <div style="display: flex; align-items: center; gap: 10px; color: #ef4444; margin-top: 10px; padding-top: 10px; border-top: 1px solid #d1d5db;">
+                                        <i class="fas fa-ban" style="font-size: 20px;"></i>
+                                        <div>
+                                            <p style="font-weight: 600; margin: 0;">Blocked</p>
+                                            <p style="font-size: 12px; color: #991b1b; margin: 0;">{{ recruiter_profile.blocked_reason }}</p>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <button class="btn btn-sm btn-primary mt-3" onclick="location.href='{% url 'recruiter_profile' %}'">
+                                <i class="fas fa-edit"></i> Edit Profile
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card">
+                <div class="stat-icon" style="color: #3b82f6;">
+                    <i class="fas fa-briefcase"></i>
+                </div>
+                <div class="stat-value">{{ total_jobs }}</div>
+                <div class="stat-label">Jobs Posted</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card">
+                <div class="stat-icon" style="color: #f59e0b;">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <div class="stat-value">{{ total_applications }}</div>
+                <div class="stat-label">Applications</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card">
+                <div class="stat-icon" style="color: #8b5cf6;">
+                    <i class="fas fa-star"></i>
+                </div>
+                <div class="stat-value">{{ shortlisted }}</div>
+                <div class="stat-label">Shortlisted</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card">
+                <div class="stat-icon" style="color: #10b981;">
+                    <i class="fas fa-award"></i>
+                </div>
+                <div class="stat-value">{{ selected }}</div>
+                <div class="stat-label">Selected</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Job Posts Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-list"></i> Your Job Postings
+                </div>
+                <div class="card-body">
+                    {% if jobs %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Job Title</th>
+                                        <th>Criteria</th>
+                                        <th>Job Type</th>
+                                        <th>Package (LPA)</th>
+                                        <th>Deadline</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for job in jobs %}
+                                        <tr>
+                                            <td>
+                                                <strong>{{ job.title }}</strong><br>
+                                                <span style="font-size: 12px; color: #6b7280;">{{ job.company }}</span>
+                                            </td>
+                                            <td>
+                                                <span style="font-size: 13px;">
+                                                    CGPA: ≥{{ job.min_cgpa }} | Backlogs: ≤{{ job.max_backlogs }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="badge" style="background: #dbeafe; color: #1e40af;">
+                                                    {{ job.job_type }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="badge" style="background: #ecfdf5; color: #059669;">
+                                                    ₹{{ job.package|floatformat:2 }}
+                                                </span>
+                                            </td>
+                                            <td>{{ job.deadline|date:"M d, Y" }}</td>
+                                            <td>
+                                                {% if job.status == 'Open' %}
+                                                    <span class="badge" style="background: #dcfce7; color: #15803d;">
+                                                        <i class="fas fa-circle" style="font-size: 8px;"></i> Open
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge" style="background: #fee2e2; color: #7f1d1d;">
+                                                        <i class="fas fa-circle" style="font-size: 8px;"></i> Closed
+                                                    </span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                                                    <a href="{% url 'recruiter_applications' job.id %}" class="btn btn-sm btn-info" style="padding: 4px 8px; font-size: 12px;" title="View Applications">
+                                                        <i class="fas fa-file-alt"></i>
+                                                    </a>
+                                                    <form method="post" action="{% url 'job_toggle_status' job.id %}" style="display:inline;">
+                                                        {% csrf_token %}
+                                                        {% if job.status == 'Open' %}
+                                                            <button type="submit" class="btn btn-sm btn-warning" style="padding: 4px 8px; font-size: 12px;" title="Close Job">
+                                                                <i class="fas fa-lock"></i>
+                                                            </button>
+                                                        {% else %}
+                                                            <button type="submit" class="btn btn-sm btn-success" style="padding: 4px 8px; font-size: 12px;" title="Open Job">
+                                                                <i class="fas fa-unlock"></i>
+                                                            </button>
+                                                        {% endif %}
+                                                    </form>
+                                                    <a href="{% url 'job_detail' job.id %}" class="btn btn-sm btn-primary" style="padding: 4px 8px; font-size: 12px;" title="View Details">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <a href="{% url 'job_detail' job.id %}" class="btn btn-sm btn-secondary" style="padding: 4px 8px; font-size: 12px;" title="Edit Job">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div style="text-align: center; padding: 40px; color: #6b7280;">
+                            <i class="fas fa-briefcase" style="font-size: 40px; color: #d1d5db; margin-bottom: 15px; display: block;"></i>
+                            <p>No job postings yet</p>
+                            <p style="font-size: 13px; margin-bottom: 15px;">Create your first job posting to get started!</p>
+                            <button class="btn btn-primary" onclick="location.href='{% url 'job_create' %}'">
+                                <i class="fas fa-plus-circle"></i> Post Job
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

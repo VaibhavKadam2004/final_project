@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>{{ job.title }} at {{ job.company }}</h3>
+<p>{{ job.description }}</p>
+<p>Min CGPA: {{ job.min_cgpa }} • Max Backlogs: {{ job.max_backlogs }}</p>
+{% if user.is_authenticated and user.is_student %}
+  {% if applied %}
+    <button class="btn btn-secondary" disabled>Already Applied</button>
+  {% else %}
+    <form method="post" action="{% url 'apply_job' job.pk %}" style="display:inline;">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-success">Apply</button>
+    </form>
+  {% endif %}
+{% else %}
+  <p><a href="{% url 'login' %}">Login as student</a> to apply.</p>
+{% endif %}
+<div id="countdown" class="mt-3"></div>
+<script>
+  // Simple deadline countdown
+  const deadline = new Date("{{ job.deadline|date:'Y-m-d H:i:s' }}").getTime();
+  function updateCountdown(){
+    const now = new Date().getTime();
+    const diff = deadline - now;
+    if(diff<=0){ document.getElementById('countdown').innerText='Deadline passed'; clearInterval(i); return; }
+    const days = Math.floor(diff/(1000*60*60*24));
+    const hrs = Math.floor((diff%(1000*60*60*24))/(1000*60*60));
+    document.getElementById('countdown').innerText = `Time left: ${days}d ${hrs}h`;
+  }
+  const i=setInterval(updateCountdown,1000);
+  updateCountdown();
+</script>
+{% endblock %}

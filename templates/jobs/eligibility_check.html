@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+
+{% block title %}Job Eligibility Check{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h2>{{ job.title }} at {{ job.company }}</h2>
+            <p class="text-muted">Eligibility Check</p>
+            <hr>
+        </div>
+    </div>
+
+    <!-- Eligibility Result -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body text-center">
+                    {% if is_eligible %}
+                        <h1 class="text-success">✅ {{ badge.text }}</h1>
+                        <p class="text-success"><strong>You are eligible to apply for this job!</strong></p>
+                        <hr>
+                        <a href="{% url 'apply_job' job.pk %}" class="btn btn-success btn-lg">
+                            Apply Now →
+                        </a>
+                    {% else %}
+                        <h1 class="text-danger">🔒 {{ badge.text }}</h1>
+                        <p class="text-danger"><strong>You are not eligible to apply for this job.</strong></p>
+                        <hr>
+                        <p>See reasons below and fix the issues to become eligible.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Job Summary -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>📋 Job Requirements</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Min CGPA:</strong> {{ job.min_cgpa }}</p>
+                    <p><strong>Max Backlogs:</strong> {{ job.max_backlogs }}</p>
+                    {% if job.branches %}
+                        <p><strong>Branches:</strong></p>
+                        <code>{{ job.branches }}</code>
+                    {% endif %}
+                    <p><strong>Type:</strong> {{ job.job_type }}</p>
+                    {% if job.package %}
+                        <p><strong>Package:</strong> ₹{{ job.package }} LPA</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Eligibility Reasons -->
+    {% if not is_eligible %}
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5>❌ Reasons You're Not Eligible</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        {% for reason in reasons %}
+                            <li class="mb-2">
+                                <h6>{{ reason }}</h6>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- How to Fix -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5>💡 How to Become Eligible</h5>
+                </div>
+                <div class="card-body">
+                    <h6>To apply for this job, you need to:</h6>
+                    <ol>
+                        {% if "Profile incomplete" in reasons|strtitle %}
+                            <li>Update your profile with all academic details (CGPA, Backlogs, etc.)</li>
+                        {% endif %}
+                        {% if "CGPA too low" in reasons|strtitle %}
+                            <li>Improve your CGPA to at least {{ job.min_cgpa }}</li>
+                        {% endif %}
+                        {% if "Too many backlogs" in reasons|strtitle %}
+                            <li>Clear your backlogs (Current: {{ profile.active_backlogs }}, Max allowed: {{ job.max_backlogs }})</li>
+                        {% endif %}
+                        {% if "Branch not eligible" in reasons|strtitle %}
+                            <li>This job is only open to: {{ job.branches }}</li>
+                        {% endif %}
+                        {% if "Blocked" in reasons|strtitle %}
+                            <li>Your PCS score is too low. Contact TPO to appeal or wait for auto-unblock.</li>
+                        {% endif %}
+                        {% if "Not verified" in reasons|strtitle %}
+                            <li>Get your profile verified by TPO. Contact them for verification.</li>
+                        {% endif %}
+                        {% if "Blacklisted" in reasons|strtitle %}
+                            <li>You have been blacklisted by TPO. Contact them to appeal.</li>
+                        {% endif %}
+                        {% if "Missing resume" in reasons|strtitle %}
+                            <li>Upload your resume in your profile settings</li>
+                        {% endif %}
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Job Details -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>📄 Job Description</h5>
+                </div>
+                <div class="card-body">
+                    {{ job.description }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <a href="{% url 'job_detail' job.pk %}" class="btn btn-secondary">← Back to Job</a>
+            {% if is_eligible %}
+                <a href="{% url 'apply_job' job.pk %}" class="btn btn-success">Apply Now →</a>
+            {% else %}
+                <a href="{% url 'student_profile' %}" class="btn btn-primary">Update Profile</a>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

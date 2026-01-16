@@ -1,0 +1,224 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Student Dashboard - My Applications{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 style="font-weight: 700; color: #0b2545; margin: 0;">
+                <i class="fas fa-user-graduate"></i> Welcome, {{ user.first_name|default:user.username }}
+            </h2>
+            <p style="color: #6b7280; margin-top: 5px;">Manage your applications and track placement progress</p>
+        </div>
+    </div>
+
+    <!-- Profile Status Card -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 style="color: #0b2545; font-weight: 600; margin-bottom: 15px;">
+                                <i class="fas fa-id-card"></i> Academic Profile
+                            </h5>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                <div>
+                                    <p style="font-size: 12px; color: #6b7280; margin-bottom: 3px;">Roll Number</p>
+                                    <p style="font-size: 16px; font-weight: 600; color: #0b2545;">{{ profile.roll_no|default:"—" }}</p>
+                                </div>
+                                <div>
+                                    <p style="font-size: 12px; color: #6b7280; margin-bottom: 3px;">Branch</p>
+                                    <p style="font-size: 16px; font-weight: 600; color: #0b2545;">{{ profile.branch|default:"—" }}</p>
+                                </div>
+                                <div>
+                                    <p style="font-size: 12px; color: #6b7280; margin-bottom: 3px;">CGPA</p>
+                                    <p style="font-size: 16px; font-weight: 600; color: #0b2545;">{{ profile.cgpa|default:"—" }}</p>
+                                </div>
+                                <div>
+                                    <p style="font-size: 12px; color: #6b7280; margin-bottom: 3px;">Active Backlogs</p>
+                                    <p style="font-size: 16px; font-weight: 600; color: #0b2545;">{{ profile.active_backlogs }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 style="color: #0b2545; font-weight: 600; margin-bottom: 15px;">
+                                <i class="fas fa-check-circle"></i> Verification Status
+                            </h5>
+                            <div style="padding: 15px; background: #f3f4f6; border-radius: 8px;">
+                                {% if profile.is_verified %}
+                                    <div style="display: flex; align-items: center; gap: 10px; color: #10b981;">
+                                        <i class="fas fa-check-circle" style="font-size: 20px;"></i>
+                                        <div>
+                                            <p style="font-weight: 600; margin: 0;">Profile Verified</p>
+                                            <p style="font-size: 12px; color: #059669; margin: 0;">Verified by TPO on {{ profile.verified_at|date:"M d, Y" }}</p>
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <div style="display: flex; align-items: center; gap: 10px; color: #f59e0b;">
+                                        <i class="fas fa-hourglass-half" style="font-size: 20px;"></i>
+                                        <div>
+                                            <p style="font-weight: 600; margin: 0;">Pending Verification</p>
+                                            <p style="font-size: 12px; color: #d97706; margin: 0;">Your profile is awaiting TPO verification</p>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                {% if profile.is_blacklisted %}
+                                    <div style="display: flex; align-items: center; gap: 10px; color: #ef4444; margin-top: 10px; padding-top: 10px; border-top: 1px solid #d1d5db;">
+                                        <i class="fas fa-ban" style="font-size: 20px;"></i>
+                                        <div>
+                                            <p style="font-weight: 600; margin: 0;">Blacklisted</p>
+                                            <p style="font-size: 12px; color: #991b1b; margin: 0;">{{ profile.blacklist_reason }}</p>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <button class="btn btn-sm btn-primary mt-3" onclick="location.href='{% url 'student_profile' %}'">
+                                <i class="fas fa-edit"></i> Edit Profile
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card">
+                <div class="stat-icon" style="color: #3b82f6;">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <div class="stat-value">{{ total_applications }}</div>
+                <div class="stat-label">Applications</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card">
+                <div class="stat-icon" style="color: #f59e0b;">
+                    <i class="fas fa-hourglass-half"></i>
+                </div>
+                <div class="stat-value">{{ pending_applications }}</div>
+                <div class="stat-label">Pending</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card">
+                <div class="stat-icon" style="color: #10b981;">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-value">{{ selected_applications }}</div>
+                <div class="stat-label">Selected</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card">
+                <div class="stat-icon" style="color: #ef4444;">
+                    <i class="fas fa-times-circle"></i>
+                </div>
+                <div class="stat-value">{{ rejected_applications }}</div>
+                <div class="stat-label">Rejected</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <a href="{% url 'student_applications' %}" class="btn btn-lg btn-primary" style="border-radius: 8px; padding: 12px 24px; font-weight: 600;">
+                <i class="fas fa-chart-line"></i> View Full Application Status & Timeline
+            </a>
+            <a href="{% url 'job_list' %}" class="btn btn-lg btn-outline-primary" style="border-radius: 8px; padding: 12px 24px; font-weight: 600; margin-left: 10px;">
+                <i class="fas fa-search"></i> Browse More Jobs
+            </a>
+        </div>
+    </div>
+
+    <!-- Applications Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-list"></i> Recent Applications
+                </div>
+                <div class="card-body">
+                    {% if applications %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Company & Job Title</th>
+                                        <th>Job Type</th>
+                                        <th>Package (LPA)</th>
+                                        <th>Applied On</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for app in applications %}
+                                        <tr>
+                                            <td>
+                                                <strong>{{ app.job.company }}</strong><br>
+                                                <span style="font-size: 12px; color: #6b7280;">{{ app.job.title }}</span>
+                                            </td>
+                                            <td>
+                                                <span class="badge" style="background: #dbeafe; color: #1e40af;">
+                                                    {{ app.job.job_type }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="badge" style="background: #ecfdf5; color: #059669;">
+                                                    ₹{{ app.job.package|floatformat:2 }}
+                                                </span>
+                                            </td>
+                                            <td>{{ app.applied_at|date:"M d, Y" }}</td>
+                                            <td>
+                                                {% if app.status == 'Pending' %}
+                                                    <span class="badge" style="background: #fef3c7; color: #92400e;">
+                                                        <i class="fas fa-hourglass-half"></i> Pending
+                                                    </span>
+                                                {% elif app.status == 'Shortlisted' %}
+                                                    <span class="badge" style="background: #bfdbfe; color: #1e3a8a;">
+                                                        <i class="fas fa-star"></i> Shortlisted
+                                                    </span>
+                                                {% elif app.status == 'Selected' %}
+                                                    <span class="badge" style="background: #dcfce7; color: #15803d;">
+                                                        <i class="fas fa-check-circle"></i> Selected
+                                                    </span>
+                                                {% elif app.status == 'Rejected' %}
+                                                    <span class="badge" style="background: #fee2e2; color: #7f1d1d;">
+                                                        <i class="fas fa-times-circle"></i> Rejected
+                                                    </span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <a href="{% url 'job_detail' app.job.id %}" class="btn btn-sm btn-primary" style="padding: 4px 8px; font-size: 12px;">
+                                                    <i class="fas fa-eye"></i> View
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div style="text-align: center; padding: 40px; color: #6b7280;">
+                            <i class="fas fa-inbox" style="font-size: 40px; color: #d1d5db; margin-bottom: 15px; display: block;"></i>
+                            <p>No applications yet</p>
+                            <p style="font-size: 13px; margin-bottom: 15px;">Browse available jobs and start applying!</p>
+                            <button class="btn btn-primary" onclick="location.href='{% url 'job_list' %}'">
+                                <i class="fas fa-briefcase"></i> Browse Jobs
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

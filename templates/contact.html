@@ -1,0 +1,276 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Contact Us - Smart Placement Portal{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-5">
+        <div class="col-12">
+            <h1 style="color: #0b2545; font-weight: 700; margin-bottom: 10px;">
+                <i class="fas fa-envelope"></i> Contact Us
+            </h1>
+            <p class="text-muted">We're here to help. Send us your message and we'll get back to you soon.</p>
+            <hr>
+        </div>
+    </div>
+
+    <!-- Messages Display -->
+    {% if messages %}
+        <div class="row mb-4">
+            <div class="col-12">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        <i class="fas fa-check-circle"></i> {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="row">
+        <!-- Contact Form -->
+        <div class="col-lg-8 mb-5">
+            <div class="card">
+                <div class="card-body p-4">
+                    <h5 style="color: #0b2545; margin-bottom: 25px;">
+                        <i class="fas fa-pen-fancy"></i> Send us a Message
+                    </h5>
+                    
+                    <form method="POST" class="needs-validation">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="name" class="form-label" style="color: #0b2545; font-weight: 600;">
+                                Full Name <span style="color: #ef4444;">*</span>
+                            </label>
+                            <input 
+                                type="text" 
+                                class="form-control" 
+                                id="name" 
+                                name="name" 
+                                placeholder="Enter your full name"
+                                required
+                            >
+                            <div class="invalid-feedback">
+                                Please provide your full name.
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label" style="color: #0b2545; font-weight: 600;">
+                                Email Address <span style="color: #ef4444;">*</span>
+                            </label>
+                            <input 
+                                type="email" 
+                                class="form-control" 
+                                id="email" 
+                                name="email" 
+                                placeholder="Enter your email address"
+                                required
+                            >
+                            <div class="invalid-feedback">
+                                Please provide a valid email address.
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="subject" class="form-label" style="color: #0b2545; font-weight: 600;">
+                                Subject <span style="color: #ef4444;">*</span>
+                            </label>
+                            <select class="form-control" id="subject" name="subject" required>
+                                <option value="">-- Select a Subject --</option>
+                                <option value="General Inquiry">General Inquiry</option>
+                                <option value="Bug Report">Bug Report</option>
+                                <option value="Feature Request">Feature Request</option>
+                                <option value="Account Issues">Account Issues</option>
+                                <option value="Placement Issue">Placement Issue</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            <div class="invalid-feedback">
+                                Please select a subject.
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="message" class="form-label" style="color: #0b2545; font-weight: 600;">
+                                Message <span style="color: #ef4444;">*</span>
+                            </label>
+                            <textarea 
+                                class="form-control" 
+                                id="message" 
+                                name="message" 
+                                rows="6"
+                                placeholder="Type your message here... (minimum 10 characters)"
+                                required
+                                minlength="10"
+                            ></textarea>
+                            <div class="invalid-feedback">
+                                Please provide a message (at least 10 characters).
+                            </div>
+                            <small class="form-text text-muted d-block mt-2">
+                                <i class="fas fa-info-circle"></i> We'll typically respond within 24 hours.
+                            </small>
+                        </div>
+
+                        <div class="form-check mb-4">
+                            <input 
+                                class="form-check-input" 
+                                type="checkbox" 
+                                id="agree" 
+                                required
+                            >
+                            <label class="form-check-label" for="agree">
+                                I agree that my submitted information can be used to respond to my inquiry
+                            </label>
+                            <div class="invalid-feedback">
+                                You must agree before submitting.
+                            </div>
+                        </div>
+
+                        <div>
+                            <button type="submit" class="btn btn-primary btn-lg" style="background: linear-gradient(135deg, #0b2545, #1e40af); border: none;">
+                                <i class="fas fa-paper-plane"></i> Send Message
+                            </button>
+                            <a href="/" class="btn btn-outline-secondary btn-lg ms-2">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Information -->
+        <div class="col-lg-4">
+            <!-- Quick Info -->
+            <div class="card mb-4" style="border-left: 4px solid #0b2545;">
+                <div class="card-body">
+                    <h5 style="color: #0b2545; margin-bottom: 20px;">
+                        <i class="fas fa-info-circle"></i> Quick Info
+                    </h5>
+                    <div class="mb-3">
+                        <p style="color: #0b2545; font-weight: 600; margin-bottom: 5px;">
+                            <i class="fas fa-envelope" style="color: #f59e0b; width: 20px;"></i> Email
+                        </p>
+                        <p class="text-muted">support@placementportal.com</p>
+                    </div>
+                    <div class="mb-3">
+                        <p style="color: #0b2545; font-weight: 600; margin-bottom: 5px;">
+                            <i class="fas fa-phone" style="color: #f59e0b; width: 20px;"></i> Phone
+                        </p>
+                        <p class="text-muted">+91 XXXX-XXX-XXX</p>
+                    </div>
+                    <div>
+                        <p style="color: #0b2545; font-weight: 600; margin-bottom: 5px;">
+                            <i class="fas fa-clock" style="color: #f59e0b; width: 20px;"></i> Response Time
+                        </p>
+                        <p class="text-muted">Within 24 hours</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FAQ Section -->
+            <div class="card mb-4" style="border-left: 4px solid #10b981;">
+                <div class="card-body">
+                    <h5 style="color: #0b2545; margin-bottom: 20px;">
+                        <i class="fas fa-question-circle"></i> FAQ
+                    </h5>
+                    <div class="accordion" id="faqAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingOne">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
+                                    How do I reset my password?
+                                </button>
+                            </h2>
+                            <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Click on "Forgot Password" on the login page and follow the instructions.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingTwo">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
+                                    How do I update my profile?
+                                </button>
+                            </h2>
+                            <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Go to your dashboard and click on "Edit Profile" to update your information.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingThree">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree">
+                                    What is the PCS system?
+                                </button>
+                            </h2>
+                            <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    PCS (Placement Credit Score) tracks your accountability and performance throughout the placement cycle.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Support Categories -->
+            <div class="card" style="border-left: 4px solid #3b82f6;">
+                <div class="card-body">
+                    <h5 style="color: #0b2545; margin-bottom: 20px;">
+                        <i class="fas fa-tags"></i> Support Categories
+                    </h5>
+                    <div class="d-flex flex-wrap gap-2">
+                        <span class="badge bg-light text-dark border border-primary">
+                            <i class="fas fa-graduation-cap"></i> Student Support
+                        </span>
+                        <span class="badge bg-light text-dark border border-primary">
+                            <i class="fas fa-briefcase"></i> Recruiter Support
+                        </span>
+                        <span class="badge bg-light text-dark border border-primary">
+                            <i class="fas fa-university"></i> TPO Support
+                        </span>
+                        <span class="badge bg-light text-dark border border-primary">
+                            <i class="fas fa-tools"></i> Technical Support
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Form Validation Script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const forms = document.querySelectorAll('.needs-validation');
+    Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+    });
+});
+
+// Real-time validation feedback
+document.getElementById('email').addEventListener('blur', function() {
+    const email = this.value;
+    const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    this.classList.toggle('is-invalid', !isValid && email.length > 0);
+    this.classList.toggle('is-valid', isValid);
+});
+
+document.getElementById('message').addEventListener('input', function() {
+    const isValid = this.value.length >= 10;
+    this.classList.toggle('is-valid', isValid);
+    this.classList.toggle('is-invalid', !isValid && this.value.length > 0);
+});
+</script>
+{% endblock %}

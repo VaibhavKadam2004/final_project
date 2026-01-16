@@ -1,0 +1,347 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Applications - {{ job.title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h2 style="font-weight: 700; color: #0b2545; margin: 0;">
+                        <i class="fas fa-file-alt"></i> Applications for {{ job.title }}
+                    </h2>
+                    <p style="color: #6b7280; margin-top: 5px;">{{ job.company }} • Manage candidate applications and update status</p>
+                </div>
+                <a href="{% url 'recruiter_dashboard' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Job Info Card -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p style="font-size: 12px; color: #6b7280; margin-bottom: 3px;">Job Title</p>
+                            <p style="font-size: 16px; font-weight: 600; color: #0b2545; margin-bottom: 15px;">{{ job.title }}</p>
+                            
+                            <p style="font-size: 12px; color: #6b7280; margin-bottom: 3px;">Criteria</p>
+                            <p style="font-size: 14px; color: #0b2545; margin-bottom: 15px;">
+                                CGPA: ≥{{ job.min_cgpa }} • Backlogs: ≤{{ job.max_backlogs }}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p style="font-size: 12px; color: #6b7280; margin-bottom: 3px;">Package (LPA)</p>
+                            <p style="font-size: 16px; font-weight: 600; color: #0b2545; margin-bottom: 15px;">₹{{ job.package|floatformat:2 }}</p>
+                            
+                            <p style="font-size: 12px; color: #6b7280; margin-bottom: 3px;">Deadline</p>
+                            <p style="font-size: 14px; color: #0b2545;">{{ job.deadline|date:"M d, Y • H:i" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card">
+                <div class="stat-icon" style="color: #3b82f6;">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-value">{{ total_applications }}</div>
+                <div class="stat-label">Total Applications</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card">
+                <div class="stat-icon" style="color: #f59e0b;">
+                    <i class="fas fa-hourglass-half"></i>
+                </div>
+                <div class="stat-value">{{ pending_count }}</div>
+                <div class="stat-label">Pending</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card">
+                <div class="stat-icon" style="color: #8b5cf6;">
+                    <i class="fas fa-star"></i>
+                </div>
+                <div class="stat-value">{{ shortlisted_count }}</div>
+                <div class="stat-label">Shortlisted</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card">
+                <div class="stat-icon" style="color: #10b981;">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-value">{{ selected_count }}</div>
+                <div class="stat-label">Selected</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Applications Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-list"></i> Candidates
+                </div>
+                <div class="card-body">
+                    {% if applications %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Student Name</th>
+                                        <th>Email</th>
+                                        <th>CGPA</th>
+                                        <th>Backlogs</th>
+                                        <th>Applied On</th>
+                                        <th>Current Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for app in applications %}
+                                        <tr>
+                                            <td>
+                                                <strong>{{ app.student.first_name }} {{ app.student.last_name }}</strong><br>
+                                                <span style="font-size: 12px; color: #6b7280;">{{ app.student.username }}</span>
+                                            </td>
+                                            <td>{{ app.student.email }}</td>
+                                            <td>
+                                                {% if app.student.student_profile.cgpa %}
+                                                    <strong>{{ app.student.student_profile.cgpa }}</strong>
+                                                {% else %}
+                                                    <span style="color: #6b7280;">-</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if app.student.student_profile.active_backlogs %}
+                                                    <strong>{{ app.student.student_profile.active_backlogs }}</strong>
+                                                {% else %}
+                                                    <span style="color: #6b7280;">-</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ app.applied_at|date:"M d, Y" }}</td>
+                                            <td>
+                                                {% if app.status == 'Pending' %}
+                                                    <span class="badge" style="background: #fef3c7; color: #b45309;">
+                                                        <i class="fas fa-circle" style="font-size: 8px;"></i> {{ app.status }}
+                                                    </span>
+                                                {% elif app.status == 'Shortlisted' %}
+                                                    <span class="badge" style="background: #dbeafe; color: #1e40af;">
+                                                        <i class="fas fa-star"></i> {{ app.status }}
+                                                    </span>
+                                                {% elif app.status == 'Selected' %}
+                                                    <span class="badge" style="background: #dcfce7; color: #15803d;">
+                                                        <i class="fas fa-check-circle"></i> {{ app.status }}
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge" style="background: #fee2e2; color: #991b1b;">
+                                                        <i class="fas fa-times-circle"></i> {{ app.status }}
+                                                    </span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <!-- Update Status Modal Button -->
+                                                <button 
+                                                    type="button" 
+                                                    class="btn btn-sm btn-primary" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#updateStatusModal{{ app.id }}"
+                                                    style="padding: 4px 8px; font-size: 12px;">
+                                                    <i class="fas fa-edit"></i> Update
+                                                </button>
+                                            </td>
+                                        </tr>
+
+                                        <!-- Update Status Modal -->
+                                        <div class="modal fade" id="updateStatusModal{{ app.id }}" tabindex="-1">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title">
+                                                            Update Application Status
+                                                        </h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                    </div>
+                                                    <form method="post">
+                                                        {% csrf_token %}
+                                                        <div class="modal-body">
+                                                            <p style="font-weight: 600; margin-bottom: 10px;">
+                                                                {{ app.student.first_name }} {{ app.student.last_name }}
+                                                            </p>
+                                                            
+                                                            <div class="mb-3">
+                                                                <label for="status{{ app.id }}" class="form-label">New Status</label>
+                                                                <select class="form-select" name="status" id="status{{ app.id }}" required>
+                                                                    <option value="">-- Select Status --</option>
+                                                                    {% for value, label in status_choices %}
+                                                                        <option value="{{ value }}" {% if app.status == value %}selected{% endif %}>
+                                                                            {{ label }}
+                                                                        </option>
+                                                                    {% endfor %}
+                                                                </select>
+                                                            </div>
+                                                            
+                                                            <div class="mb-3">
+                                                                <label for="note{{ app.id }}" class="form-label">Add Note (Optional)</label>
+                                                                <textarea 
+                                                                    class="form-control" 
+                                                                    name="note" 
+                                                                    id="note{{ app.id }}"
+                                                                    rows="3"
+                                                                    placeholder="E.g., Selected for technical round, Failed coding test, etc.">
+                                                                </textarea>
+                                                                <small class="form-text text-muted">
+                                                                    Add a note about why you're changing the status (e.g., interview round, reason for rejection)
+                                                                </small>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                            <input type="hidden" name="app_id" value="{{ app.id }}">
+                                                            <button type="submit" class="btn btn-primary">
+                                                                <i class="fas fa-save"></i> Update Status
+                                                            </button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div style="text-align: center; padding: 40px; color: #6b7280;">
+                            <i class="fas fa-inbox" style="font-size: 40px; color: #d1d5db; margin-bottom: 15px; display: block;"></i>
+                            <p>No applications yet</p>
+                            <p style="font-size: 13px;">Applications will appear here once students start applying</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .stat-card {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .stat-icon {
+        font-size: 24px;
+        margin-bottom: 10px;
+    }
+
+    .stat-value {
+        font-size: 28px;
+        font-weight: 700;
+        color: #0b2545;
+        margin-bottom: 5px;
+    }
+
+    .stat-label {
+        font-size: 12px;
+        color: #6b7280;
+        text-transform: uppercase;
+        font-weight: 600;
+    }
+
+    .badge {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    .table-responsive {
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .table th {
+        background-color: #f3f4f6;
+        font-weight: 600;
+        color: #0b2545;
+        border: none;
+        padding: 12px;
+    }
+
+    .table td {
+        padding: 12px;
+        vertical-align: middle;
+        border: none;
+    }
+
+    .table tbody tr {
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f9fafb;
+    }
+
+    .card {
+        border: none;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    .card-header {
+        background-color: #f3f4f6;
+        border: none;
+        font-weight: 600;
+        color: #0b2545;
+        padding: 15px;
+    }
+
+    .btn {
+        border-radius: 6px;
+        font-weight: 500;
+    }
+
+    .btn-primary {
+        background-color: #1e40af;
+        border-color: #1e40af;
+    }
+
+    .btn-primary:hover {
+        background-color: #1e3a8a;
+        border-color: #1e3a8a;
+    }
+
+    .btn-secondary {
+        background-color: #6b7280;
+        border-color: #6b7280;
+    }
+
+    .btn-secondary:hover {
+        background-color: #4b5563;
+        border-color: #4b5563;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,255 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Recruiter Profile - Smart Placement Portal{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 style="font-weight: 700; color: #0b2545; margin: 0;">
+                <i class="fas fa-building"></i> Company Profile
+            </h2>
+            <p style="color: #6b7280; margin-top: 5px;">Manage your company information and placement settings</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Left Column: Company Information -->
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header" style="background: linear-gradient(135deg, #0b2545 0%, #1e40af 100%); color: white; font-weight: 600;">
+                    <i class="fas fa-info-circle"></i> Company Information
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="">
+                        {% csrf_token %}
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Company Name</label>
+                                <input type="text" class="form-control" value="{{ profile.company_name }}">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Industry</label>
+                                <input type="text" class="form-control" value="{{ profile.industry }}">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <label class="form-label">Website</label>
+                                <input type="url" class="form-control" value="{{ profile.website }}">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <label class="form-label">Company Description</label>
+                                <textarea class="form-control" rows="4">{{ profile.description }}</textarea>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">HR Contact Email</label>
+                                <input type="email" class="form-control" value="{{ profile.hr_contact_email }}">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">HR Contact Phone</label>
+                                <input type="tel" class="form-control" value="{{ profile.hr_contact_phone }}">
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> Your profile information helps students understand your company better.
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Placement Statistics -->
+            <div class="card">
+                <div class="card-header" style="background: linear-gradient(135deg, #0b2545 0%, #1e40af 100%); color: white; font-weight: 600;">
+                    <i class="fas fa-chart-bar"></i> Placement Statistics
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="stat-card">
+                                <div class="stat-icon" style="color: #3b82f6;">
+                                    <i class="fas fa-briefcase"></i>
+                                </div>
+                                <div class="stat-value">{{ total_jobs|default:0 }}</div>
+                                <div class="stat-label">Jobs Posted</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="stat-card">
+                                <div class="stat-icon" style="color: #f59e0b;">
+                                    <i class="fas fa-file-alt"></i>
+                                </div>
+                                <div class="stat-value">{{ total_applications|default:0 }}</div>
+                                <div class="stat-label">Applications</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="stat-card">
+                                <div class="stat-icon" style="color: #10b981;">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <div class="stat-value">{{ selected_candidates|default:0 }}</div>
+                                <div class="stat-label">Selected</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="stat-card">
+                                <div class="stat-icon" style="color: #ef4444;">
+                                    <i class="fas fa-percent"></i>
+                                </div>
+                                <div class="stat-value">{{ conversion_rate|default:"0%" }}</div>
+                                <div class="stat-label">Conversion Rate</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Status & Actions -->
+        <div class="col-lg-4">
+            <!-- Approval Status Card -->
+            <div class="card mb-4">
+                <div class="card-header" style="background: linear-gradient(135deg, #0b2545 0%, #1e40af 100%); color: white; font-weight: 600;">
+                    <i class="fas fa-shield-alt"></i> Approval Status
+                </div>
+                <div class="card-body">
+                    {% if profile.is_approved %}
+                        <div style="text-align: center; padding: 15px;">
+                            <i class="fas fa-check-circle" style="font-size: 48px; color: #10b981;"></i>
+                            <p style="font-weight: 600; color: #10b981; margin-top: 10px;">Approved</p>
+                            <p style="font-size: 12px; color: #6b7280;">
+                                Approved on {{ profile.approved_at|date:"M d, Y" }}
+                            </p>
+                        </div>
+                    {% elif profile.is_blocked %}
+                        <div style="text-align: center; padding: 15px;">
+                            <i class="fas fa-ban" style="font-size: 48px; color: #ef4444;"></i>
+                            <p style="font-weight: 600; color: #ef4444; margin-top: 10px;">Blocked</p>
+                            <p style="font-size: 12px; color: #6b7280;">
+                                Reason: {{ profile.block_reason }}
+                            </p>
+                        </div>
+                    {% else %}
+                        <div style="text-align: center; padding: 15px;">
+                            <i class="fas fa-hourglass-half" style="font-size: 48px; color: #f59e0b;"></i>
+                            <p style="font-weight: 600; color: #f59e0b; margin-top: 10px;">Pending Approval</p>
+                            <p style="font-size: 12px; color: #6b7280;">
+                                Your profile is awaiting TPO approval
+                            </p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Capabilities Card -->
+            <div class="card mb-4">
+                <div class="card-header" style="background: linear-gradient(135deg, #0b2545 0%, #1e40af 100%); color: white; font-weight: 600;">
+                    <i class="fas fa-check"></i> Capabilities
+                </div>
+                <div class="card-body">
+                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #e5e7eb;">
+                        <span style="color: #6b7280;">Post Jobs</span>
+                        {% if profile.is_approved %}
+                            <span class="badge" style="background: #dcfce7; color: #15803d;"><i class="fas fa-check"></i> Enabled</span>
+                        {% else %}
+                            <span class="badge" style="background: #fee2e2; color: #7f1d1d;"><i class="fas fa-times"></i> Disabled</span>
+                        {% endif %}
+                    </div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #e5e7eb;">
+                        <span style="color: #6b7280;">Manage Applications</span>
+                        {% if profile.is_approved %}
+                            <span class="badge" style="background: #dcfce7; color: #15803d;"><i class="fas fa-check"></i> Enabled</span>
+                        {% else %}
+                            <span class="badge" style="background: #fee2e2; color: #7f1d1d;"><i class="fas fa-times"></i> Disabled</span>
+                        {% endif %}
+                    </div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0;">
+                        <span style="color: #6b7280;">Download Resumes</span>
+                        {% if profile.is_approved %}
+                            <span class="badge" style="background: #dcfce7; color: #15803d;"><i class="fas fa-check"></i> Enabled</span>
+                        {% else %}
+                            <span class="badge" style="background: #fee2e2; color: #7f1d1d;"><i class="fas fa-times"></i> Disabled</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Links -->
+            <div class="card">
+                <div class="card-header" style="background: linear-gradient(135deg, #0b2545 0%, #1e40af 100%); color: white; font-weight: 600;">
+                    <i class="fas fa-link"></i> Quick Links
+                </div>
+                <div class="card-body">
+                    <a href="{% url 'recruiter_dashboard' %}" class="btn btn-sm btn-primary w-100 mb-2">
+                        <i class="fas fa-chart-line"></i> Dashboard
+                    </a>
+                    <a href="{% url 'job_list' %}" class="btn btn-sm btn-secondary w-100 mb-2">
+                        <i class="fas fa-briefcase"></i> View All Jobs
+                    </a>
+                    <a href="{% url 'job_create' %}" class="btn btn-sm btn-success w-100" {% if not profile.is_approved %}disabled{% endif %}>
+                        <i class="fas fa-plus-circle"></i> Post New Job
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <a href="{% url 'recruiter_dashboard' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .stat-card {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e5e7eb;
+        transition: all 0.3s ease;
+    }
+    
+    .stat-card:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        transform: translateY(-2px);
+    }
+    
+    .stat-icon {
+        font-size: 32px;
+        margin-bottom: 10px;
+    }
+    
+    .stat-value {
+        font-size: 28px;
+        font-weight: 700;
+        color: #0b2545;
+        margin-bottom: 5px;
+    }
+    
+    .stat-label {
+        font-size: 13px;
+        color: #6b7280;
+    }
+</style>
+{% endblock %}

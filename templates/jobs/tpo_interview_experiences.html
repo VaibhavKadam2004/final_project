@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+
+{% block title %}TPO - Approve Interview Experiences{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h1>✅ Manage Interview Experiences</h1>
+            <p class="text-muted">Review and approve student submissions for Prep Vault</p>
+            <hr>
+        </div>
+    </div>
+
+    <!-- Status Filter -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <ul class="nav nav-tabs">
+                <li class="nav-item">
+                    <a class="nav-link {% if not current_status or current_status == 'Pending' %}active{% endif %}" 
+                       href="?status=Pending">
+                        ⏳ Pending (<span class="badge badge-danger">{{ pending_count }}</span>)
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if current_status == 'Approved' %}active{% endif %}" 
+                       href="?status=Approved">
+                        ✅ Approved (<span class="badge badge-success">{{ approved_count }}</span>)
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="?status=Rejected">
+                        ❌ Rejected
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Experiences List -->
+    <div class="row">
+        <div class="col-md-12">
+            {% if experiences %}
+                {% for exp in experiences %}
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <h5 class="mb-0">
+                                        {{ exp.company }} - {{ exp.job_title }}
+                                        <span class="badge badge-info">Round {{ exp.round_number }}</span>
+                                        {% if exp.status == 'Pending' %}
+                                            <span class="badge badge-warning">⏳ Pending</span>
+                                        {% elif exp.status == 'Approved' %}
+                                            <span class="badge badge-success">✅ Approved</span>
+                                        {% else %}
+                                            <span class="badge badge-danger">❌ Rejected</span>
+                                        {% endif %}
+                                    </h5>
+                                </div>
+                                <div class="col-md-4 text-right">
+                                    <small class="text-muted">
+                                        By: <strong>{{ exp.student.username }}</strong> on {{ exp.created_at|date:"d-M-Y H:i" }}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card-body">
+                            <!-- Meta Info -->
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <small>
+                                        <strong>Round Type:</strong> {{ exp.round_type }}<br>
+                                        <strong>Duration:</strong> {{ exp.duration_minutes }} minutes<br>
+                                        <strong>Difficulty:</strong> 
+                                        {% if exp.difficulty == "Easy" %}
+                                            <span class="badge badge-success">Easy</span>
+                                        {% elif exp.difficulty == "Medium" %}
+                                            <span class="badge badge-warning">Medium</span>
+                                        {% else %}
+                                            <span class="badge badge-danger">Hard</span>
+                                        {% endif %}
+                                    </small>
+                                </div>
+                                <div class="col-md-3">
+                                    <small>
+                                        <strong>Result:</strong> 
+                                        {% if exp.selected_after %}
+                                            <span class="badge badge-success">✅ Selected</span>
+                                        {% else %}
+                                            <span class="badge badge-danger">❌ Not Selected</span>
+                                        {% endif %}
+                                    </small>
+                                </div>
+                                <div class="col-md-3">
+                                    <small>
+                                        <strong>Views:</strong> {{ exp.views_count }}<br>
+                                        <strong>Helpful:</strong> {{ exp.helpful_count }}
+                                    </small>
+                                </div>
+                                <div class="col-md-3">
+                                    {% if exp.approved_by %}
+                                        <small>
+                                            <strong>Reviewed by:</strong> {{ exp.approved_by.username }}
+                                        </small>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <hr>
+
+                            <!-- Questions Asked -->
+                            <div class="mb-3">
+                                <h6>📝 <strong>Questions Asked</strong></h6>
+                                <div style="background: #f8f9fa; padding: 10px; border-radius: 5px;">
+                                    <pre style="margin: 0; white-space: pre-wrap; word-wrap: break-word;">{{ exp.questions_asked }}</pre>
+                                </div>
+                            </div>
+
+                            <!-- Experience -->
+                            <div class="mb-3">
+                                <h6>💡 <strong>Student's Experience</strong></h6>
+                                <p>{{ exp.your_experience|truncatewords:100 }}</p>
+                            </div>
+
+                            <!-- Tips -->
+                            <div class="mb-3">
+                                <h6>🎯 <strong>Tips for Future Candidates</strong></h6>
+                                <p>{{ exp.tips_for_others|truncatewords:100 }}</p>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        {% if exp.status == 'Pending' %}
+                        <div class="card-footer">
+                            <form method="POST" action="{% url 'interview_experience_approve' exp.pk %}" style="display: inline;">
+                                {% csrf_token %}
+                                <button type="submit" name="action" value="approve" class="btn btn-success">
+                                    ✅ Approve
+                                </button>
+                                <button type="submit" name="action" value="reject" class="btn btn-danger" 
+                                        onclick="return confirm('Are you sure you want to reject this?');">
+                                    ❌ Reject
+                                </button>
+                            </form>
+                        </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="card">
+                    <div class="card-body text-center p-5">
+                        <h4>📭 No experiences to review</h4>
+                        <p class="text-muted">
+                            {% if current_status == 'Pending' %}
+                                All submissions have been reviewed!
+                            {% else %}
+                                No experiences in this category.
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

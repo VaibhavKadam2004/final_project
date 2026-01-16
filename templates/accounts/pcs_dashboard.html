@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Placement Credit Score Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>📊 Placement Credit Score (PCS) Dashboard</h1>
+            <hr>
+        </div>
+    </div>
+
+    <!-- PCS Score Card -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card border-{{ status_color }}">
+                <div class="card-body text-center">
+                    <h2 class="text-{{ status_color }}">{{ pcs_score }}/100</h2>
+                    <h5 class="badge badge-{{ status_color }}">{{ pcs_status }} {{ status_icon }}</h5>
+                    <p class="mt-3">
+                        {% if can_apply %}
+                            <span class="badge badge-success">✅ Can Apply for Jobs</span>
+                        {% else %}
+                            <span class="badge badge-danger">❌ Cannot Apply</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5>📈 PCS Overview</h5>
+                    <ul class="list-unstyled">
+                        <li><strong>Penalties Applied:</strong> {{ penalties_count }}</li>
+                        <li><strong>Total Penalty Points:</strong> -{{ total_penalties }}</li>
+                        <li><strong>Status:</strong> 
+                            {% if is_blocked %}
+                                <span class="badge badge-danger">🔒 BLOCKED</span>
+                            {% else %}
+                                <span class="badge badge-success">✅ ACTIVE</span>
+                            {% endif %}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Blocking Info -->
+    {% if is_blocked %}
+    <div class="alert alert-danger" role="alert">
+        <h4 class="alert-heading">⚠️ Account Blocked</h4>
+        <p>{{ block_reason }}</p>
+        {% if blocked_until %}
+            <hr>
+            <small>Will be automatically unblocked on: <strong>{{ blocked_until|date:"d-M-Y H:i" }}</strong></small>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- PCS Thresholds -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>📋 PCS Thresholds</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-3">
+                            <h6>⭐⭐⭐⭐⭐ Excellent</h6>
+                            <p class="text-success"><strong>95-100</strong></p>
+                        </div>
+                        <div class="col-md-3">
+                            <h6>⭐⭐⭐⭐ Good</h6>
+                            <p class="text-info"><strong>85-94</strong></p>
+                        </div>
+                        <div class="col-md-3">
+                            <h6>⭐⭐⭐ Warning</h6>
+                            <p class="text-warning"><strong>70-84</strong></p>
+                        </div>
+                        <div class="col-md-3">
+                            <h6>⭐ Critical</h6>
+                            <p class="text-danger"><strong>&lt; 70</strong></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Penalty History -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>📜 Penalty History</h5>
+                </div>
+                <div class="card-body">
+                    {% if history %}
+                        <div class="table-responsive">
+                            <table class="table table-sm table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Date & Time</th>
+                                        <th>Penalty Type</th>
+                                        <th>Reason</th>
+                                        <th>Points</th>
+                                        <th>Score Change</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for entry in history %}
+                                        <tr>
+                                            <td><small>{{ entry.timestamp|slice:":16" }}</small></td>
+                                            <td>
+                                                {% if entry.type == "missed_interview" %}
+                                                    <span class="badge badge-warning">Missed Interview</span>
+                                                {% elif entry.type == "rejected_offer" %}
+                                                    <span class="badge badge-danger">Rejected Offer</span>
+                                                {% elif entry.type == "ghosted_interview" %}
+                                                    <span class="badge badge-secondary">Ghosted Interview</span>
+                                                {% elif entry.type == "rejected_after_accepted" %}
+                                                    <span class="badge badge-dark">Rejected After Acceptance</span>
+                                                {% else %}
+                                                    <span class="badge badge-info">{{ entry.type }}</span>
+                                                {% endif %}
+                                            </td>
+                                            <td><small>{{ entry.reason }}</small></td>
+                                            <td><span class="badge badge-danger">-{{ entry.penalty }}</span></td>
+                                            <td>
+                                                <small>
+                                                    {{ entry.old_score }} → {{ entry.new_score }}
+                                                </small>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No penalties recorded. Great job! ✅</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PCS Rules -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5>ℹ️ PCS Penalty Rules</h5>
+                </div>
+                <div class="card-body">
+                    <ul>
+                        <li><strong>Missed Interview:</strong> -20 points (No-show for scheduled interview)</li>
+                        <li><strong>Rejected Offer:</strong> -50 points (Rejected job offer after acceptance)</li>
+                        <li><strong>Ghosted Interview:</strong> -15 points (Did not respond after interview)</li>
+                        <li><strong>Rejected After Accepted:</strong> -40 points (Backed out from commitment)</li>
+                    </ul>
+                    <hr>
+                    <p><strong>Critical Threshold:</strong> Score below 50 results in automatic blocking for 15 days</p>
+                    <p><strong>Auto-Unblock:</strong> Your account will be automatically unblocked after the cooling period</p>
+                    <p><strong>Appeal:</strong> Contact TPO at tpo@college.edu to appeal a blocking decision</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4 mb-4">
+        <div class="col-md-12">
+            <a href="{% url 'student_dashboard' %}" class="btn btn-secondary">← Back to Dashboard</a>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

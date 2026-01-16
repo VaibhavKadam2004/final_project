@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+
+{% block title %}Your Recruiter Rating{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h1>⭐ Your Responsiveness Rating</h1>
+            <p class="text-muted">How fast you respond to student applications</p>
+            <hr>
+        </div>
+    </div>
+
+    <!-- Rating Display -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card border-primary">
+                <div class="card-body text-center">
+                    <h2 class="display-4 text-primary">{{ rating.responsiveness_rating }}/5.0</h2>
+                    <h4>{{ rating.rating_label }}</h4>
+                    <div style="font-size: 2rem; margin: 20px 0;">
+                        {{ rating.rating_label|slice:":5" }}
+                    </div>
+                    <p class="text-muted">
+                        Based on your application response time
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>📊 Response Statistics</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <strong>Avg Response Time:</strong><br>
+                        <h4 class="text-info">{{ rating.avg_response_hours }} hours</h4>
+                    </div>
+                    <hr>
+                    <p><strong>Total Applications:</strong> {{ rating.total_applications }}</p>
+                    <p><strong>Responses Given:</strong> {{ rating.responses_given }}</p>
+                    <p><strong>Jobs Posted:</strong> {{ rating.total_jobs_posted }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rating Explanation -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5>ℹ️ Rating Breakdown</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Response Time</th>
+                                <th>Rating</th>
+                                <th>Label</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr {% if rating.avg_response_hours < 24 %}class="table-success"{% endif %}>
+                                <td>0-24 hours</td>
+                                <td>⭐⭐⭐⭐⭐</td>
+                                <td><strong>Very Fast Responder</strong></td>
+                            </tr>
+                            <tr {% if 24 <= rating.avg_response_hours < 72 %}class="table-success"{% endif %}>
+                                <td>24-72 hours (3 days)</td>
+                                <td>⭐⭐⭐⭐</td>
+                                <td><strong>Fast Responder</strong></td>
+                            </tr>
+                            <tr {% if 72 <= rating.avg_response_hours < 168 %}class="table-warning"{% endif %}>
+                                <td>72-168 hours (7 days)</td>
+                                <td>⭐⭐⭐</td>
+                                <td><strong>Average Responder</strong></td>
+                            </tr>
+                            <tr {% if 168 <= rating.avg_response_hours < 336 %}class="table-warning"{% endif %}>
+                                <td>168-336 hours (14 days)</td>
+                                <td>⭐⭐</td>
+                                <td><strong>Slow Responder</strong></td>
+                            </tr>
+                            <tr {% if rating.avg_response_hours >= 336 %}class="table-danger"{% endif %}>
+                                <td>336+ hours (14+ days)</td>
+                                <td>⭐</td>
+                                <td><strong>Very Slow Responder</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Impact Info -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="alert alert-warning" role="alert">
+                <h5>⚠️ Impact on Students</h5>
+                <p>
+                    Your responsiveness rating is displayed on all your job postings. 
+                    Students prefer applying to jobs from recruiters with fast response times!
+                </p>
+                <ul>
+                    <li><strong>Very Fast Responder (⭐⭐⭐⭐⭐):</strong> Gets 50% more applications</li>
+                    <li><strong>Fast Responder (⭐⭐⭐⭐):</strong> Gets 25% more applications</li>
+                    <li><strong>Average Responder (⭐⭐⭐):</strong> Standard visibility</li>
+                    <li><strong>Slow Responder (⭐⭐):</strong> Gets 20% fewer applications</li>
+                    <li><strong>Very Slow Responder (⭐):</strong> Gets 50% fewer applications</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tips to Improve -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5>💡 How to Improve Your Rating</h5>
+                </div>
+                <div class="card-body">
+                    <ol>
+                        <li><strong>Respond quickly to applications:</strong> Aim for under 24 hours</li>
+                        <li><strong>Keep students updated:</strong> Even if you need more time, let them know</li>
+                        <li><strong>Set clear timelines:</strong> Tell students when they can expect a response</li>
+                        <li><strong>Be consistent:</strong> Respond to all applications equally fast</li>
+                        <li><strong>Use the dashboard:</strong> Check pending applications regularly</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <a href="{% url 'recruiter_dashboard' %}" class="btn btn-secondary">← Back to Dashboard</a>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

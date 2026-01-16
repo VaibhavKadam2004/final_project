@@ -1,0 +1,235 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Applications - Job Status{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5" style="background: linear-gradient(135deg, #0b2545 0%, #1e3c72 100%); min-height: 100vh;">
+    <div class="container">
+        <!-- Page Header -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <h2 style="color: white; font-weight: 700; margin-bottom: 10px;">
+                    <i class="fas fa-briefcase"></i> My Job Applications
+                </h2>
+                <p style="color: rgba(255,255,255,0.8); font-size: 16px;">Track your application status across all jobs</p>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="row mb-4">
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="card border-0 shadow-sm" style="background: white; border-radius: 12px;">
+                    <div class="card-body text-center">
+                        <div style="font-size: 28px; color: #3b82f6; margin-bottom: 10px;">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <h6 style="color: #6b7280; font-size: 13px; margin-bottom: 5px;">TOTAL APPLICATIONS</h6>
+                        <h3 style="color: #0b2545; font-weight: 700; margin: 0;">{{ total_applied }}</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="card border-0 shadow-sm" style="background: white; border-radius: 12px;">
+                    <div class="card-body text-center">
+                        <div style="font-size: 28px; color: #f59e0b; margin-bottom: 10px;">
+                            <i class="fas fa-hourglass-half"></i>
+                        </div>
+                        <h6 style="color: #6b7280; font-size: 13px; margin-bottom: 5px;">SHORTLISTED</h6>
+                        <h3 style="color: #0b2545; font-weight: 700; margin: 0;">{{ shortlisted_count }}</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="card border-0 shadow-sm" style="background: white; border-radius: 12px;">
+                    <div class="card-body text-center">
+                        <div style="font-size: 28px; color: #10b981; margin-bottom: 10px;">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <h6 style="color: #6b7280; font-size: 13px; margin-bottom: 5px;">SELECTED</h6>
+                        <h3 style="color: #0b2545; font-weight: 700; margin: 0;">{{ selected_count }}</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="card border-0 shadow-sm" style="background: white; border-radius: 12px;">
+                    <div class="card-body text-center">
+                        <div style="font-size: 28px; color: #ef4444; margin-bottom: 10px;">
+                            <i class="fas fa-times-circle"></i>
+                        </div>
+                        <h6 style="color: #6b7280; font-size: 13px; margin-bottom: 5px;">REJECTED</h6>
+                        <h3 style="color: #0b2545; font-weight: 700; margin: 0;">{{ rejected_count }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Applications Table/List -->
+        <div class="row">
+            <div class="col-12">
+                {% if applications %}
+                    <div class="card border-0 shadow-sm" style="border-radius: 12px; overflow: hidden;">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead style="background: #f3f4f6; border-bottom: 2px solid #e5e7eb;">
+                                    <tr>
+                                        <th style="color: #6b7280; font-weight: 600; padding: 18px;">Company</th>
+                                        <th style="color: #6b7280; font-weight: 600; padding: 18px;">Position</th>
+                                        <th style="color: #6b7280; font-weight: 600; padding: 18px;">Applied Date</th>
+                                        <th style="color: #6b7280; font-weight: 600; padding: 18px;">Status</th>
+                                        <th style="color: #6b7280; font-weight: 600; padding: 18px;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for app in applications %}
+                                        <tr style="border-bottom: 1px solid #e5e7eb;">
+                                            <td style="padding: 18px; color: #0b2545; font-weight: 600;">
+                                                {{ app.job.company }}
+                                            </td>
+                                            <td style="padding: 18px; color: #374151;">
+                                                {{ app.job.title }}
+                                            </td>
+                                            <td style="padding: 18px; color: #6b7280; font-size: 14px;">
+                                                {{ app.applied_at|date:"M d, Y" }}
+                                            </td>
+                                            <td style="padding: 18px;">
+                                                {% if app.status == 'Applied' %}
+                                                    <span class="badge" style="background: #dbeafe; color: #1e40af; padding: 6px 12px; border-radius: 20px; font-weight: 500;">
+                                                        <i class="fas fa-file"></i> Applied
+                                                    </span>
+                                                {% elif app.status == 'Shortlisted' %}
+                                                    <span class="badge" style="background: #fef3c7; color: #92400e; padding: 6px 12px; border-radius: 20px; font-weight: 500;">
+                                                        <i class="fas fa-star"></i> Shortlisted
+                                                    </span>
+                                                {% elif app.status == 'Interviewing' %}
+                                                    <span class="badge" style="background: #e0e7ff; color: #3730a3; padding: 6px 12px; border-radius: 20px; font-weight: 500;">
+                                                        <i class="fas fa-phone"></i> Interviewing
+                                                    </span>
+                                                {% elif app.status == 'Selected' %}
+                                                    <span class="badge" style="background: #d1fae5; color: #065f46; padding: 6px 12px; border-radius: 20px; font-weight: 500;">
+                                                        <i class="fas fa-check"></i> Selected
+                                                    </span>
+                                                {% elif app.status == 'Rejected' %}
+                                                    <span class="badge" style="background: #fee2e2; color: #991b1b; padding: 6px 12px; border-radius: 20px; font-weight: 500;">
+                                                        <i class="fas fa-times"></i> Rejected
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge" style="background: #f3f4f6; color: #374151; padding: 6px 12px; border-radius: 20px; font-weight: 500;">
+                                                        {{ app.status }}
+                                                    </span>
+                                                {% endif %}
+                                            </td>
+                                            <td style="padding: 18px;">
+                                                <a href="{% url 'job_detail' app.job.id %}" class="btn btn-sm btn-outline-primary" style="border-radius: 6px; font-size: 12px;">
+                                                    <i class="fas fa-eye"></i> View Details
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Pagination -->
+                    {% if is_paginated %}
+                        <nav aria-label="Page navigation" class="mt-4">
+                            <ul class="pagination justify-content-center">
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page=1">First</a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                                    </li>
+                                {% endif %}
+
+                                {% for num in page_obj.paginator.page_range %}
+                                    {% if page_obj.number == num %}
+                                        <li class="page-item active">
+                                            <span class="page-link">{{ num }}</span>
+                                        </li>
+                                    {% else %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+
+                                {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    {% endif %}
+
+                    <!-- Auto-refresh Info -->
+                    <div class="alert alert-info mt-4" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); color: white; border-radius: 8px;">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Tip:</strong> This page auto-refreshes every 30 seconds to show the latest application status. You can also manually refresh using F5 or your browser's refresh button.
+                    </div>
+
+                {% else %}
+                    <div class="card border-0 shadow-sm" style="border-radius: 12px; background: white;">
+                        <div class="card-body text-center py-5">
+                            <div style="font-size: 48px; color: #d1d5db; margin-bottom: 20px;">
+                                <i class="fas fa-inbox"></i>
+                            </div>
+                            <h5 style="color: #374151; margin-bottom: 10px;">No Applications Yet</h5>
+                            <p style="color: #6b7280; margin-bottom: 20px;">
+                                You haven't applied for any jobs yet. Start by browsing available job postings.
+                            </p>
+                            <a href="{% url 'job_list' %}" class="btn btn-primary" style="border-radius: 6px;">
+                                <i class="fas fa-search"></i> Browse Jobs
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Auto-refresh Script -->
+<script>
+    // Auto-refresh the page every 30 seconds
+    setTimeout(function() {
+        location.reload();
+    }, 30000);
+
+    // Optional: Add real-time status check on individual applications
+    document.addEventListener('DOMContentLoaded', function() {
+        // You can add AJAX calls here to check specific applications in real-time
+        // Example: fetch('/jobs/api/application/1/status/')
+    });
+</script>
+
+<style>
+    .badge {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: #f9fafb;
+    }
+
+    .btn-outline-primary {
+        color: #3b82f6;
+        border-color: #3b82f6;
+        transition: all 0.3s ease;
+    }
+
+    .btn-outline-primary:hover {
+        background-color: #3b82f6;
+        color: white;
+    }
+</style>
+
+{% endblock %}
