@@ -16,77 +16,40 @@
                     <p style="color: #6b7280; margin-top: 5px;">Manage your job postings and candidate applications</p>
                 </div>
                 <div>
-                    <button class="btn btn-primary" onclick="location.href='{% url 'job_create' %}'">
+                    <a class="btn btn-primary" href="{% url 'job_create' %}">
                         <i class="fas fa-plus-circle"></i> Post New Job
-                    </button>
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Company Status Card -->
+    <!-- Company Information Card -->
     <div class="row mb-4">
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h5 style="color: #0b2545; font-weight: 600; margin-bottom: 15px;">
-                                <i class="fas fa-building"></i> Company Information
-                            </h5>
-                            <div>
-                                {% if recruiter_profile %}
-                                    <p style="font-size: 12px; color: #6b7280; margin-bottom: 3px;">Company Name</p>
-                                    <p style="font-size: 16px; font-weight: 600; color: #0b2545; margin-bottom: 10px;">{{ recruiter_profile.company_name }}</p>
-                                    <p style="font-size: 12px; color: #6b7280; margin-bottom: 3px;">Company Email</p>
-                                    <p style="font-size: 14px; color: #0b2545; margin-bottom: 10px;">{{ recruiter_profile.company_email }}</p>
-                                    {% if recruiter_profile.company_website %}
-                                        <p style="font-size: 12px; color: #6b7280; margin-bottom: 3px;">Website</p>
-                                        <p style="font-size: 14px; color: #1e40af; margin-bottom: 10px;">
-                                            <a href="{{ recruiter_profile.company_website }}" target="_blank">{{ recruiter_profile.company_website }}</a>
-                                        </p>
-                                    {% endif %}
-                                {% else %}
-                                    <p style="color: #6b7280;">No company profile found</p>
-                                {% endif %}
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <h5 style="color: #0b2545; font-weight: 600; margin-bottom: 15px;">
-                                <i class="fas fa-check-circle"></i> Approval Status
-                            </h5>
-                            <div style="padding: 15px; background: #f3f4f6; border-radius: 8px;">
-                                {% if recruiter_profile and recruiter_profile.is_approved %}
-                                    <div style="display: flex; align-items: center; gap: 10px; color: #10b981;">
-                                        <i class="fas fa-check-circle" style="font-size: 20px;"></i>
-                                        <div>
-                                            <p style="font-weight: 600; margin: 0;">Profile Approved</p>
-                                            <p style="font-size: 12px; color: #059669; margin: 0;">You can now post jobs</p>
-                                        </div>
-                                    </div>
-                                {% else %}
-                                    <div style="display: flex; align-items: center; gap: 10px; color: #f59e0b;">
-                                        <i class="fas fa-hourglass-half" style="font-size: 20px;"></i>
-                                        <div>
-                                            <p style="font-weight: 600; margin: 0;">Pending Approval</p>
-                                            <p style="font-size: 12px; color: #d97706; margin: 0;">Your profile is awaiting TPO approval</p>
-                                        </div>
-                                    </div>
-                                {% endif %}
-                                {% if recruiter_profile and recruiter_profile.is_blocked %}
-                                    <div style="display: flex; align-items: center; gap: 10px; color: #ef4444; margin-top: 10px; padding-top: 10px; border-top: 1px solid #d1d5db;">
-                                        <i class="fas fa-ban" style="font-size: 20px;"></i>
-                                        <div>
-                                            <p style="font-weight: 600; margin: 0;">Blocked</p>
-                                            <p style="font-size: 12px; color: #991b1b; margin: 0;">{{ recruiter_profile.blocked_reason }}</p>
-                                        </div>
-                                    </div>
-                                {% endif %}
-                            </div>
+                    <h5 style="color: #0b2545; font-weight: 600; margin-bottom: 15px;">
+                        <i class="fas fa-building"></i> Company Information
+                    </h5>
+                    <div>
+                        {% if recruiter_profile %}
+                            <p style="font-size: 12px; color: #6b7280; margin-bottom: 3px;">Company Name</p>
+                            <p style="font-size: 16px; font-weight: 600; color: #0b2545; margin-bottom: 10px;">{{ recruiter_profile.company_name }}</p>
+                            <p style="font-size: 12px; color: #6b7280; margin-bottom: 3px;">Company Email</p>
+                            <p style="font-size: 14px; color: #0b2545; margin-bottom: 10px;">{{ recruiter_profile.company_email }}</p>
+                            {% if recruiter_profile.company_website %}
+                                <p style="font-size: 12px; color: #6b7280; margin-bottom: 3px;">Website</p>
+                                <p style="font-size: 14px; color: #1e40af; margin-bottom: 10px;">
+                                    <a href="{{ recruiter_profile.company_website }}" target="_blank">{{ recruiter_profile.company_website }}</a>
+                                </p>
+                            {% endif %}
                             <button class="btn btn-sm btn-primary mt-3" onclick="location.href='{% url 'recruiter_profile' %}'">
                                 <i class="fas fa-edit"></i> Edit Profile
                             </button>
-                        </div>
+                        {% else %}
+                            <p style="color: #6b7280;">No company profile found</p>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -137,8 +100,11 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
-                <div class="card-header">
-                    <i class="fas fa-list"></i> Your Job Postings
+                <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <span><i class="fas fa-list"></i> Your Job Postings</span>
+                    <a href="{% url 'tpo_student_list' %}" class="btn btn-sm btn-success">
+                        <i class="fas fa-check-circle"></i> Verified Students Only
+                    </a>
                 </div>
                 <div class="card-body">
                     {% if jobs %}
@@ -224,9 +190,125 @@
                             <i class="fas fa-briefcase" style="font-size: 40px; color: #d1d5db; margin-bottom: 15px; display: block;"></i>
                             <p>No job postings yet</p>
                             <p style="font-size: 13px; margin-bottom: 15px;">Create your first job posting to get started!</p>
-                            <button class="btn btn-primary" onclick="location.href='{% url 'job_create' %}'">
+                            <a class="btn btn-primary" href="{% url 'job_create' %}">
                                 <i class="fas fa-plus-circle"></i> Post Job
-                            </button>
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shortlisted Students Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <span><i class="fas fa-star"></i> Recently Shortlisted Students</span>
+                    {% if shortlisted_applications %}
+                        <a href="#" class="btn btn-sm btn-outline-primary">View All</a>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {% if shortlisted_applications %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Student Name</th>
+                                        <th>Job Applied</th>
+                                        <th>CGPA</th>
+                                        <th>Status</th>
+                                        <th>Shortlisted Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for application in shortlisted_applications %}
+                                        <tr>
+                                            <td>
+                                                <strong>{{ application.student.get_full_name|default:application.student.username }}</strong><br>
+                                                <span style="font-size: 12px; color: #6b7280;">{{ application.student.username }}</span>
+                                            </td>
+                                            <td>
+                                                <span style="font-size: 13px;">{{ application.job.title }}</span><br>
+                                                <span style="font-size: 12px; color: #6b7280;">{{ application.job.company }}</span>
+                                            </td>
+                                            <td>{{ application.student.student_profile.cgpa|floatformat:2|default:"N/A" }}</td>
+                                            <td>
+                                                <span class="badge" style="background: #fef3c7; color: #92400e;">
+                                                    <i class="fas fa-star"></i> Shortlisted
+                                                </span>
+                                            </td>
+                                            <td>{{ application.status_last_updated_at|default:application.applied_at|date:"M d, Y" }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div style="text-align: center; padding: 40px; color: #6b7280;">
+                            <i class="fas fa-star" style="font-size: 40px; color: #d1d5db; margin-bottom: 15px; display: block;"></i>
+                            <p>No shortlisted students yet</p>
+                            <p style="font-size: 13px;">Students will appear here once you shortlist them from applications</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Selected Students Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <span><i class="fas fa-award"></i> Recently Selected Students</span>
+                    {% if selected_applications %}
+                        <a href="#" class="btn btn-sm btn-outline-success">View All</a>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {% if selected_applications %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Student Name</th>
+                                        <th>Job Applied</th>
+                                        <th>CGPA</th>
+                                        <th>Status</th>
+                                        <th>Selected Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for application in selected_applications %}
+                                        <tr>
+                                            <td>
+                                                <strong>{{ application.student.get_full_name|default:application.student.username }}</strong><br>
+                                                <span style="font-size: 12px; color: #6b7280;">{{ application.student.username }}</span>
+                                            </td>
+                                            <td>
+                                                <span style="font-size: 13px;">{{ application.job.title }}</span><br>
+                                                <span style="font-size: 12px; color: #6b7280;">{{ application.job.company }}</span>
+                                            </td>
+                                            <td>{{ application.student.student_profile.cgpa|floatformat:2|default:"N/A" }}</td>
+                                            <td>
+                                                <span class="badge" style="background: #dcfce7; color: #166534;">
+                                                    <i class="fas fa-award"></i> Selected
+                                                </span>
+                                            </td>
+                                            <td>{{ application.status_last_updated_at|default:application.applied_at|date:"M d, Y" }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div style="text-align: center; padding: 40px; color: #6b7280;">
+                            <i class="fas fa-award" style="font-size: 40px; color: #d1d5db; margin-bottom: 15px; display: block;"></i>
+                            <p>No selected students yet</p>
+                            <p style="font-size: 13px;">Students will appear here once you select them for placement</p>
                         </div>
                     {% endif %}
                 </div>

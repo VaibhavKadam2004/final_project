@@ -22,10 +22,10 @@
                 <div class="card-body">
                     <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                         <a href="?approved=true" class="btn btn-sm btn-success">
-                            <i class="fas fa-check-circle"></i> Approved Only
+                            <i class="fas fa-check-circle"></i> Approved
                         </a>
                         <a href="?blocked=true" class="btn btn-sm btn-danger">
-                            <i class="fas fa-ban"></i> Blocked Only
+                            <i class="fas fa-ban"></i> Blocked
                         </a>
                         <a href="?" class="btn btn-sm btn-secondary">
                             <i class="fas fa-list"></i> All Recruiters
@@ -96,10 +96,14 @@
                                             <td>
                                                 <div style="display: flex; gap: 5px;">
                                                     {% if not recruiter.is_approved and not recruiter.is_blocked %}
-                                                        <a href="{% url 'approve_recruiter' recruiter.user.id %}" 
-                                                           class="btn btn-sm btn-success" title="Approve">
-                                                            <i class="fas fa-thumbs-up"></i> Approve
-                                                        </a>
+                                                        <form method="POST" action="{% url 'approve_recruiter' recruiter.user.id %}" 
+                                                              style="display: inline;" 
+                                                              onsubmit="return confirm('Approve {{ recruiter.company_name }}?');">
+                                                            {% csrf_token %}
+                                                            <button type="submit" class="btn btn-sm btn-success" title="Approve">
+                                                                <i class="fas fa-thumbs-up"></i> Approve
+                                                            </button>
+                                                        </form>
                                                     {% endif %}
                                                     {% if not recruiter.is_blocked %}
                                                         <form method="POST" action="{% url 'block_recruiter' recruiter.user.id %}" 
@@ -116,9 +120,9 @@
                                                             <i class="fas fa-ban"></i> Blocked
                                                         </button>
                                                     {% endif %}
-                                                    <a href="{% url 'recruiter_profile' %}" 
+                                                    <a href="{% url 'tpo_view_recruiter_profile' recruiter.user.id %}" 
                                                        class="btn btn-sm btn-info" title="View Profile">
-                                                        <i class="fas fa-eye"></i> View
+                                                        <i class="fas fa-eye"></i> View Profile
                                                     </a>
                                                 </div>
                                             </td>
@@ -133,33 +137,6 @@
                             <p style="font-size: 16px; margin: 0;">No recruiters found</p>
                         </div>
                     {% endif %}
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Legend -->
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="card" style="background: #f9fafb; border: 1px solid #e5e7eb;">
-                <div class="card-body">
-                    <h6 style="font-weight: 600; color: #0b2545; margin-bottom: 10px;">
-                        <i class="fas fa-info-circle"></i> Status Legend
-                    </h6>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                        <div>
-                            <span class="badge bg-warning" style="color: white;">PENDING</span>
-                            <p style="font-size: 13px; color: #6b7280; margin-top: 5px;">Waiting for TPO approval</p>
-                        </div>
-                        <div>
-                            <span class="badge bg-success">APPROVED</span>
-                            <p style="font-size: 13px; color: #6b7280; margin-top: 5px;">Can post jobs and hire</p>
-                        </div>
-                        <div>
-                            <span class="badge bg-danger">BLOCKED</span>
-                            <p style="font-size: 13px; color: #6b7280; margin-top: 5px;">Restricted from posting</p>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>

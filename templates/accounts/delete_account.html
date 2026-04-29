@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Delete Account - Smart Placement Portal{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 style="font-weight: 700; color: #dc2626; margin: 0;">
+                <i class="fas fa-exclamation-triangle"></i> Delete Account
+            </h2>
+            <p style="color: #6b7280; margin-top: 5px;">This action cannot be undone. Please read carefully before proceeding.</p>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Warning Card -->
+            <div class="card border-danger mb-4">
+                <div class="card-header" style="background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); color: white; font-weight: 600;">
+                    <i class="fas fa-exclamation-triangle"></i> Warning: Account Deletion
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-danger" style="background: rgba(220, 38, 38, 0.1); border: 1px solid #dc2626; color: #dc2626;">
+                        <h5 style="margin-top: 0;"><i class="fas fa-exclamation-circle"></i> This action is permanent and cannot be reversed!</h5>
+                        <p style="margin-bottom: 0;">Once you delete your account, all your data will be permanently removed from our system.</p>
+                    </div>
+
+                    <h5 style="color: #0b2545; margin-top: 20px;">What will be deleted:</h5>
+                    <ul style="color: #374151;">
+                        <li><strong>Your account and profile information</strong></li>
+                        <li><strong>All job applications and application history</strong></li>
+                        <li><strong>Resume and profile photo</strong></li>
+                        <li><strong>Verification status and academic records</strong></li>
+                        <li><strong>Any placement records or interview experiences</strong></li>
+                    </ul>
+
+                    <h5 style="color: #0b2545; margin-top: 20px;">What will happen:</h5>
+                    <ul style="color: #374151;">
+                        <li><strong>You will be logged out immediately</strong></li>
+                        <li><strong>You cannot recover your account or data</strong></li>
+                        <li><strong>Recruiters will no longer see your applications</strong></li>
+                        <li><strong>TPO will no longer see your profile in their dashboard</strong></li>
+                    </ul>
+
+                    <div class="alert alert-info" style="background: rgba(59, 130, 246, 0.1); border: 1px solid #3b82f6; color: #1e40af; margin-top: 20px;">
+                        <h6 style="margin-top: 0;"><i class="fas fa-info-circle"></i> Before deleting your account:</h6>
+                        <ul style="margin-bottom: 0;">
+                            <li>Download any important documents or data you need</li>
+                            <li>Inform your TPO if you have any ongoing placement processes</li>
+                            <li>Consider if this is really what you want to do</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Account Summary Card -->
+            <div class="card mb-4">
+                <div class="card-header" style="background: linear-gradient(135deg, #0b2545 0%, #1e40af 100%); color: white; font-weight: 600;">
+                    <i class="fas fa-user"></i> Account Summary
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 style="color: #0b2545;">Personal Information</h6>
+                            <p style="margin-bottom: 5px;"><strong>Name:</strong> {{ user.first_name }} {{ user.last_name }}</p>
+                            <p style="margin-bottom: 5px;"><strong>Email:</strong> {{ user.email }}</p>
+                            <p style="margin-bottom: 5px;"><strong>Username:</strong> {{ user.username }}</p>
+                            <p style="margin-bottom: 0;"><strong>Member Since:</strong> {{ user.date_joined|date:"M d, Y" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 style="color: #0b2545;">Academic Information</h6>
+                            <p style="margin-bottom: 5px;"><strong>Roll Number:</strong> {{ profile.roll_no|default:"Not provided" }}</p>
+                            <p style="margin-bottom: 5px;"><strong>Branch:</strong> {{ profile.branch|default:"Not provided" }}</p>
+                            <p style="margin-bottom: 5px;"><strong>CGPA:</strong> {{ profile.cgpa|default:"Not provided" }}</p>
+                            <p style="margin-bottom: 0;"><strong>Verification Status:</strong>
+                                {% if profile.is_verified %}
+                                    <span class="badge" style="background: #dcfce7; color: #166534;">Verified</span>
+                                {% else %}
+                                    <span class="badge" style="background: #fef3c7; color: #92400e;">Pending</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Confirmation Form -->
+            <div class="card">
+                <div class="card-header" style="background: #f3f4f6; font-weight: 600; color: #0b2545;">
+                    <i class="fas fa-keyboard"></i> Confirm Account Deletion
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {% csrf_token %}
+
+                        <div class="mb-4">
+                            <label for="confirmation" class="form-label" style="font-weight: 600; color: #0b2545;">
+                                <i class="fas fa-exclamation-triangle" style="color: #dc2626;"></i>
+                                Type "delete my account" to confirm:
+                            </label>
+                            <input type="text" class="form-control" id="confirmation" name="confirmation"
+                                   placeholder="Type: delete my account"
+                                   style="border: 2px solid #e5e7eb; border-radius: 8px; padding: 12px; font-size: 16px;"
+                                   required>
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle"></i> This is case-insensitive and spaces will be ignored.
+                            </small>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a href="{% url 'student_profile' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Cancel - Keep My Account
+                            </a>
+
+                            <button type="submit" class="btn btn-danger" style="background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); border: none; padding: 12px 24px; border-radius: 8px; color: white; font-weight: 600;">
+                                <i class="fas fa-trash-alt"></i> Yes, Delete My Account
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom CSS for this page -->
+<style>
+    .card {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border: none;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .card-header {
+        border-bottom: none;
+        padding: 20px;
+    }
+
+    .card-body {
+        padding: 25px;
+    }
+
+    .btn {
+        border-radius: 8px;
+        font-weight: 600;
+        padding: 10px 20px;
+        transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .alert {
+        border-radius: 8px;
+        border: none;
+    }
+
+    .badge {
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}

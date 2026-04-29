@@ -27,7 +27,11 @@ def track_application_response_time(sender, instance, created, **kwargs):
             instance.response_time_hours = max(0, int(delta.total_seconds() / 3600))
         
         instance.status_last_updated_at = timezone.now()
-        instance.save()
+        
+        # Disconnect signal temporarily to avoid recursion
+        post_save.disconnect(track_application_response_time, sender=Application)
+        instance.save(update_fields=['first_status_change_at', 'response_time_hours', 'status_last_updated_at'])
+        post_save.connect(track_application_response_time, sender=Application)
         
         # Recalculate recruiter rating
         try:

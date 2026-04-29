@@ -9,10 +9,14 @@ class StudentSignUpForm(UserCreationForm):
         model = CustomUser
         fields = ('username','email','password1','password2')
 
-    def save(self, commit=True):
-        user = super().save(commit=False)
-        user.role_type = CustomUser.STUDENT
-        if commit:
-            user.save()
-            StudentProfile.objects.create(user=user)
-        return user
+class StudentProfileForm(forms.ModelForm):
+    class Meta:
+        model = StudentProfile
+        fields = ['tenth_percent', 'twelfth_percent', 'cgpa', 'active_backlogs', 'skills', 'resume']
+        widgets = {
+            'skills': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Comma-separated skills'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['resume'].help_text = 'Upload PDF/DOC resume for auto skill extraction'

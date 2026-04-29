@@ -3,3 +3,9 @@ mysqlclient
 pandas
 openpyxl
 pyresparser
+scikit-learn
+numpy
+transformers
+torch
+openai
+python-dotenv

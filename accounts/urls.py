@@ -10,6 +10,7 @@ urlpatterns = [
     path('logout/', views.user_logout, name='logout'),
     path('student/dashboard/', StudentDashboardView.as_view(), name='student_dashboard'),
     path('student/profile/', views.student_profile_view, name='student_profile'),
+    path('student/delete-account/', views.delete_student_account, name='delete_student_account'),
     path('recruiter/dashboard/', RecruiterDashboardView.as_view(), name='recruiter_dashboard'),
     path('recruiter/profile/', views.recruiter_profile_view, name='recruiter_profile'),
     path('tpo/dashboard/', TPODashboardView.as_view(), name='tpo_dashboard'),
@@ -19,6 +20,10 @@ urlpatterns = [
     path('tpo/recruiter/block/<int:recruiter_id>/', views.block_recruiter, name='block_recruiter'),
     path('tpo/students/', views.student_list, name='tpo_student_list'),
     path('tpo/recruiters/', views.recruiter_list, name='tpo_recruiter_list'),
+    path('tpo/placed-students/', views.placed_students_list, name='placed_students_list'),
+    path('tpo/student/<int:student_id>/details/', views.student_placement_details, name='student_placement_details'),
+    path('tpo/student/<int:student_id>/profile/', views.tpo_view_student_profile, name='tpo_view_student_profile'),
+    path('tpo/recruiter/<int:recruiter_id>/profile/', views.tpo_view_recruiter_profile, name='tpo_view_recruiter_profile'),
     
     # Advanced Features URLs
     path('student/pcs-dashboard/', views.pcs_dashboard, name='pcs_dashboard'),

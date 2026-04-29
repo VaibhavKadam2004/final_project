@@ -402,11 +402,28 @@ class RecruiterDashboardView(RecruiterRequiredMixin, TemplateView):
             status=Application.STATUS_SELECTED
         ).count()
         
+        # Get recruiter profile
+        recruiter_profile = getattr(self.request.user, 'recruiter_profile', None)
+        
+        # Get lists of shortlisted and selected students
+        shortlisted_applications = Application.objects.filter(
+            job__posted_by=self.request.user,
+            status=Application.STATUS_SHORTLISTED
+        ).select_related('student__student_profile', 'job').order_by('-status_last_updated_at')[:10]  # Limit to 10 for dashboard
+        
+        selected_applications = Application.objects.filter(
+            job__posted_by=self.request.user,
+            status=Application.STATUS_SELECTED
+        ).select_related('student__student_profile', 'job').order_by('-status_last_updated_at')[:10]  # Limit to 10 for dashboard
+        
+        ctx['recruiter_profile'] = recruiter_profile
         ctx['jobs'] = jobs
         ctx['total_jobs'] = jobs.count()
         ctx['total_applications'] = total_applications
-        ctx['shortlisted_count'] = shortlisted
-        ctx['selected_count'] = selected
+        ctx['shortlisted'] = shortlisted
+        ctx['selected'] = selected
+        ctx['shortlisted_applications'] = shortlisted_applications
+        ctx['selected_applications'] = selected_applications
         
         return ctx
 
@@ -511,7 +528,28 @@ class TPODashboardView(TPORequiredMixin, TemplateView):
         ctx['total_placements'] = ctx['placed_count']
         ctx['unverified_students'] = StudentProfile.objects.filter(is_verified=False)
         ctx['unapproved_recruiters'] = RecruiterProfile.objects.filter(is_approved=False)
-        
+
+        # Placement status counts for dashboard chart
+        ctx['placement_status_counts'] = {
+            'selected': Application.objects.filter(status=Application.STATUS_SELECTED).count(),
+            'shortlisted': Application.objects.filter(status=Application.STATUS_SHORTLISTED).count(),
+            'pending': Application.objects.filter(status=Application.STATUS_PENDING).count(),
+            'rejected': Application.objects.filter(status=Application.STATUS_REJECTED).count(),
+        }
+
+        # AI placement insights for branch-wise analytics
+        ctx['placement_insights'] = {
+            'overall_placement_rate': 0,
+            'total_applications': ctx['total_applications'],
+            'total_placements': ctx['total_placements'],
+            'branch_wise': {}
+        }
+        try:
+            from ai_analytics.views import generate_overall_placement_analysis
+            ctx['placement_insights'] = generate_overall_placement_analysis()
+        except Exception:
+            pass
+
         return ctx
 
 
@@ -601,6 +639,8 @@ class TPOExportPlacedView(TPORequiredMixin, View):
         rows = []
         for app in qs:
             profile = getattr(app.student, 'student_profile', None)
+            selected_entry = app.status_history.filter(status=Application.STATUS_SELECTED).first()
+            selected_date = selected_entry.timestamp.strftime('%Y-%m-%d') if selected_entry else (app.status_last_updated_at.strftime('%Y-%m-%d') if app.status_last_updated_at else '')
             rows.append({
                 'Student Name': app.student.get_full_name() or app.student.username,
                 'Email': app.student.email,
@@ -610,7 +650,7 @@ class TPOExportPlacedView(TPORequiredMixin, View):
                 'Position': app.job.title,
                 'Package (LPA)': app.job.package,
                 'Applied Date': app.applied_at.strftime('%Y-%m-%d'),
-                'Selected Date': app.status_history.filter(status=Application.STATUS_SELECTED).first().timestamp.strftime('%Y-%m-%d'),
+                'Selected Date': selected_date,
             })
 
         df = pd.DataFrame(rows)

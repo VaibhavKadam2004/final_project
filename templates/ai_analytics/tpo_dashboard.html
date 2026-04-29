@@ -1,0 +1,534 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}AI Placement Analytics Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-chart-line"></i> AI-Powered Placement Analytics Dashboard
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <!-- Analytics Controls -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <button id="overall-placement-btn" class="btn btn-success btn-lg w-100">
+                                <i class="fas fa-users"></i> Overall Placement Analysis
+                            </button>
+                        </div>
+                        <div class="col-md-3">
+                            <button id="skill-demand-btn" class="btn btn-info btn-lg w-100">
+                                <i class="fas fa-cogs"></i> Skill Demand Analysis
+                            </button>
+                        </div>
+                        <div class="col-md-3">
+                            <form id="company-recommendation-form" class="d-flex">
+                                <input type="text" id="company-name-input" class="form-control me-2"
+                                       placeholder="Company name for recommendations">
+                                <button type="submit" class="btn btn-warning">
+                                    <i class="fas fa-user-check"></i> Get Recommendations
+                                </button>
+                            </form>
+                        </div>
+                        <div class="col-md-3">
+                            <button id="company-skill-demand-btn" class="btn btn-secondary btn-lg w-100">
+                                <i class="fas fa-search"></i> Company Skill Analysis
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Loading Indicator -->
+                    <div id="loading-indicator" class="text-center d-none">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Analyzing...</span>
+                        </div>
+                        <p class="mt-2">AI is analyzing placement data...</p>
+                    </div>
+
+                    <!-- Results Container -->
+                    <div id="analytics-results">
+                        <!-- Default Welcome Message -->
+                        <div class="text-center py-5" id="welcome-message">
+                            <i class="fas fa-brain fa-3x text-muted mb-3"></i>
+                            <h4>Welcome to AI Analytics Dashboard</h4>
+                            <p class="text-muted">Click on any analysis button above to generate insights</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Overall Placement Analysis Template -->
+<script type="text/template" id="overall-placement-template">
+    <div class="row">
+        <div class="col-md-3 mb-4">
+            <div class="card bg-primary text-white h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-users fa-2x mb-2"></i>
+                    <h4><%= data.total_students %></h4>
+                    <p class="mb-0">Total Students</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card bg-success text-white h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-briefcase fa-2x mb-2"></i>
+                    <h4><%= data.total_placements %></h4>
+                    <p class="mb-0">Total Placements</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card bg-info text-white h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-file-alt fa-2x mb-2"></i>
+                    <h4><%= data.total_applications %></h4>
+                    <p class="mb-0">Total Applications</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card bg-warning text-white h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-percentage fa-2x mb-2"></i>
+                    <h4><%= data.overall_placement_rate %>%</h4>
+                    <p class="mb-0">Placement Rate</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Branch-wise Placement</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Branch</th>
+                                    <th>Total Students</th>
+                                    <th>Placed</th>
+                                    <th>Placement Rate</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% _.each(data.branch_wise, function(stats, branch) { %>
+                                    <tr>
+                                        <td><%= branch %></td>
+                                        <td><%= stats.total_students %></td>
+                                        <td><%= stats.placed %></td>
+                                        <td>
+                                            <span class="badge bg-<%= stats.placement_rate > 70 ? 'success' : stats.placement_rate > 50 ? 'warning' : 'danger' %>">
+                                                <%= stats.placement_rate %>%
+                                            </span>
+                                        </td>
+                                    </tr>
+                                <% }); %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Company-wise Performance</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Company</th>
+                                    <th>Applications</th>
+                                    <th>Selections</th>
+                                    <th>Selection Rate</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% _.each(data.company_wise, function(stats, company) { %>
+                                    <tr>
+                                        <td><%= company %></td>
+                                        <td><%= stats.applications %></td>
+                                        <td><%= stats.selections %></td>
+                                        <td>
+                                            <span class="badge bg-<%= stats.selection_rate > 30 ? 'success' : stats.selection_rate > 15 ? 'warning' : 'danger' %>">
+                                                <%= stats.selection_rate %>%
+                                            </span>
+                                        </td>
+                                    </tr>
+                                <% }); %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
+<!-- Skill Demand Analysis Template -->
+<script type="text/template" id="skill-demand-template">
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Top 10 Most Demanded Skills</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <% const demandEntries = Object.entries(data.overall_demand || {}).sort((a, b) => b[1] - a[1]).slice(0, 10); %>
+                        <% _.each(demandEntries, function(entry) { %>
+                            <% const skill = entry[0]; const count = entry[1]; %>
+                            <div class="col-md-6 mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold"><%= skill %></span>
+                                    <div>
+                                        <span class="badge bg-primary me-2"><%= count %> jobs</span>
+                                        <small class="text-muted">(<%= ((count / Object.keys(data.overall_demand || {}).length) * 100).toFixed(1) %>%)</small>
+                                    </div>
+                                </div>
+                                <div class="progress mt-1" style="height: 8px;">
+                                    <div class="progress-bar bg-success" style="width: <%= (count / Math.max(...Object.values(data.overall_demand || {}))) * 100 %>%"></div>
+                                </div>
+                            </div>
+                        <% }); %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Company Skill Focus</h5>
+                </div>
+                <div class="card-body">
+                    <% _.each(data.company_focus || {}, function(skills, company) { %>
+                        <% const skillEntries = Object.entries(skills || {}).sort(function(a, b) { return b[1] - a[1]; }).slice(0, 5); %>
+                        <div class="mb-4">
+                            <h6 class="text-primary"><%= company %></h6>
+                            <div class="ms-3">
+                                <% _.each(skillEntries, function(entry) { %>
+                                    <% const skill = entry[0]; const count = entry[1]; %>
+                                    <span class="badge bg-secondary me-1 mb-1"><%= skill %> (<%= count %>)</span>
+                                <% }); %>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
+<!-- Student Recommendations Template -->
+<script type="text/template" id="student-recommendations-template">
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="card">
+                <div class="card-header bg-warning text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-user-check"></i> Top Student Recommendations for <%= data.company %>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <strong>Required Skills:</strong>
+                        <% _.each(data.required_skills, function(skill) { %>
+                            <span class="badge bg-light text-dark me-1"><%= skill %></span>
+                        <% }); %>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Student Name</th>
+                                    <th>Match Score</th>
+                                    <th>Matching Skills</th>
+                                    <th>Skill Gaps</th>
+                                    <th>Profile</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% _.each(data.recommendations, function(rec) { %>
+                                    <tr>
+                                        <td><%= rec.student_name %></td>
+                                        <td>
+                                            <span class="badge bg-<%= rec.match_score > 70 ? 'success' : rec.match_score > 50 ? 'warning' : 'danger' %>">
+                                                <%= rec.match_score %>%
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <% _.each(rec.matching_skills, function(skill) { %>
+                                                <span class="badge bg-success me-1"><%= skill %></span>
+                                            <% }); %>
+                                        </td>
+                                        <td>
+                                            <% _.each(rec.skill_gaps, function(skill) { %>
+                                                <span class="badge bg-warning me-1"><%= skill %></span>
+                                            <% }); %>
+                                        </td>
+                                        <td>
+                                            <small>
+                                                CGPA: <%= rec.profile.cgpa %><br>
+                                                Branch: <%= rec.profile.branch %>
+                                            </small>
+                                        </td>
+                                    </tr>
+                                <% }); %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
+<!-- JavaScript for AJAX calls -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.13.6/underscore-min.js"></script>
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// Ensure jQuery is loaded before proceeding
+if (typeof jQuery === 'undefined') {
+    console.error('jQuery is not loaded');
+} else {
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!(/^GET|HEAD|OPTIONS|TRACE$/.test(settings.type))) {
+                xhr.setRequestHeader('X-CSRFToken', getCookie('csrftoken'));
+            }
+        }
+    });
+}
+
+$(document).ready(function() {
+    console.log('AI Analytics Dashboard JavaScript loaded');
+
+    // Overall Placement Analysis
+    $('#overall-placement-btn').on('click', function(e) {
+        e.preventDefault();
+        console.log('Overall Placement Analysis button clicked');
+        generateAnalytics('overall_placement', 'Overall Placement Analysis');
+    });
+
+    // Skill Demand Analysis
+    $('#skill-demand-btn').on('click', function(e) {
+        e.preventDefault();
+        console.log('Skill Demand Analysis button clicked');
+        generateAnalytics('skill_demand', 'Skill Demand Analysis');
+    });
+
+    // Company Recommendations
+    $('#company-recommendation-form').on('submit', function(e) {
+        e.preventDefault();
+        const companyName = $('#company-name-input').val().trim();
+        console.log('Company recommendation form submitted for:', companyName);
+
+        if (!companyName) {
+            alert('Please enter a company name');
+            return;
+        }
+
+        generateAnalytics('student_recommendation', 'Student Recommendations', { company_name: companyName });
+    });
+
+    // Company Skill Demand
+    $('#company-skill-demand-btn').on('click', function(e) {
+        e.preventDefault();
+        console.log('Company Skill Demand button clicked');
+        const companyName = prompt('Enter company name for skill analysis:');
+        if (companyName && companyName.trim()) {
+            analyzeCompanySkills(companyName.trim());
+        }
+    });
+
+    function generateAnalytics(analysisType, title, extraData = {}) {
+        console.log('Generating analytics:', analysisType, title, extraData);
+        $('#loading-indicator').removeClass('d-none');
+        $('#welcome-message').addClass('d-none');
+
+        const postData = new FormData();
+        postData.append('analysis_type', analysisType);
+        postData.append('csrfmiddlewaretoken', getCookie('csrftoken'));
+        
+        for (let key in extraData) {
+            postData.append(key, extraData[key]);
+        }
+
+        console.log('Sending POST request to /ai/tpo/generate-analytics/');
+
+        $.ajax({
+            url: '/ai/tpo/generate-analytics/',
+            type: 'POST',
+            data: postData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            success: function(data) {
+                console.log('Analytics response received:', data);
+                $('#loading-indicator').addClass('d-none');
+
+                if (data.success) {
+                    displayAnalyticsResults(data.analytics, analysisType, title);
+                } else {
+                    alert('Error: ' + (data.error || 'Unknown error'));
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('AJAX Error:', xhr.status, xhr.statusText, xhr.responseText);
+                $('#loading-indicator').addClass('d-none');
+                let errorMsg = 'Analysis failed. Please try again.';
+                try {
+                    const response = JSON.parse(xhr.responseText);
+                    if (response.error) {
+                        errorMsg += '\n' + response.error;
+                    }
+                } catch (e) {}
+                alert(errorMsg);
+            }
+        });
+    }
+
+    function analyzeCompanySkills(companyName) {
+        console.log('Analyzing company skills for:', companyName);
+        $('#loading-indicator').removeClass('d-none');
+
+        const formData = new FormData();
+        formData.append('company_name', companyName);
+        formData.append('csrfmiddlewaretoken', getCookie('csrftoken'));
+
+        $.ajax({
+            url: '/ai/tpo/company-skill-demand/',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            success: function(data) {
+                console.log('Company skills response received:', data);
+                $('#loading-indicator').addClass('d-none');
+
+                if (data.success) {
+                    displayAnalyticsResults(data.analysis, 'skill_demand', `Skill Analysis: ${companyName}`);
+                } else {
+                    alert('Error: ' + (data.error || 'Unknown error'));
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('AJAX Error:', xhr.status, xhr.statusText, xhr.responseText);
+                $('#loading-indicator').addClass('d-none');
+                let errorMsg = 'Analysis failed. Please try again.';
+                try {
+                    const response = JSON.parse(xhr.responseText);
+                    if (response.error) {
+                        errorMsg += '\n' + response.error;
+                    }
+                } catch (e) {}
+                alert(errorMsg);
+            }
+        });
+    }
+
+    function displayAnalyticsResults(data, type, title) {
+        let templateId = '';
+        let templateData = data;
+
+        switch(type) {
+            case 'overall_placement':
+                templateId = '#overall-placement-template';
+                break;
+            case 'skill_demand':
+                templateId = '#skill-demand-template';
+                break;
+            case 'student_recommendation':
+                templateId = '#student-recommendations-template';
+                break;
+        }
+
+        if (templateId && $(templateId).length > 0) {
+            try {
+                const template = _.template($(templateId).html());
+                const html = template({ data: templateData });
+
+                $('#analytics-results').html(`
+                    <div class="mb-4">
+                        <h4 class="text-primary">${title}</h4>
+                        <hr>
+                    </div>
+                    ${html}
+                `);
+            } catch (e) {
+                console.error('Template rendering error:', e);
+                alert('Error displaying results: ' + e.message);
+            }
+        } else {
+            console.error('Template not found:', templateId);
+            alert('Template error: ' + templateId);
+        }
+    }
+});
+</script>
+
+<style>
+.card {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border: none;
+    border-radius: 8px;
+}
+
+.card-header {
+    border-radius: 8px 8px 0 0 !important;
+}
+
+.table th {
+    border-top: none;
+    font-weight: 600;
+}
+
+.badge {
+    font-size: 0.8em;
+}
+
+.progress {
+    border-radius: 4px;
+}
+</style>
+{% endblock %}

@@ -33,5 +33,27 @@ Advanced features and notes:
 - Export to Excel: use `pandas`/`openpyxl` to export placed students.
 - Zip resumes: TPO or Recruiter can download shortlisted resumes as a .zip file.
 
-Security and RBAC:
-- `CustomUser.role_type` controls access. Add decorators and checks in views for stricter RBAC.
+## Advanced AI Features
+
+### 1. OpenAI GPT Integration
+- **Setup**: Copy `.env.example` to `.env` and add your `OPENAI_API_KEY`
+- **Usage**: Access GPT-powered career recommendations via `/ai/gpt-recommendations/`
+- **Features**: Personalized advice based on student skills and job requirements
+
+### 2. Custom ML Model Training
+- **Command**: `python manage.py train_models`
+- **Purpose**: Trains RandomForest model on historical placement data for prediction
+- **Output**: Model saved to `ai_models/placement_predictor.pkl`
+- **Accuracy**: Displays training accuracy in console
+
+### 3. Resume Parsing with PyResparser
+- **Automatic**: Skills extracted when students upload resumes in profile
+- **Integration**: Built into student profile update view
+- **Fallback**: Manual skill entry still available if parsing fails
+
+### Environment Setup
+```bash
+pip install python-dotenv
+cp .env.example .env
+# Edit .env with your API keys
+```

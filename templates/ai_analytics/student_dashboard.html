@@ -1,0 +1,334 @@
+{% extends 'base.html' %}
+{% load static ai_tags %}
+
+{% block title %}AI Skill Analysis Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-brain"></i> AI-Powered Skill Analysis Dashboard
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <!-- Analysis Trigger -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <button id="analyze-skills-btn" class="btn btn-success btn-lg w-100">
+                                <i class="fas fa-search"></i> Analyze My Skills
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <form id="dream-company-form" class="d-flex">
+                                <input type="text" id="dream-company-input" class="form-control me-2"
+                                       placeholder="Enter your dream company (e.g., Google, Microsoft)">
+                                <button type="submit" class="btn btn-info">
+                                    <i class="fas fa-star"></i> Analyze Fit
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Loading Indicator -->
+                    <div id="loading-indicator" class="text-center d-none">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Analyzing...</span>
+                        </div>
+                        <p class="mt-2">AI is analyzing your profile and skills...</p>
+                    </div>
+
+                    <!-- Results Container -->
+                    <div id="analysis-results" class="row">
+                        <!-- Current Skills -->
+                        <div class="col-md-6 mb-4">
+                            <div class="card h-100">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fas fa-tools"></i> Your Current Skills
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div id="current-skills-container">
+                                        {% if latest_analysis %}
+                                            {% for skill in latest_analysis.current_skills|load_json %}
+                                                <span class="badge bg-success me-1 mb-1">{{ skill }}</span>
+                                            {% endfor %}
+                                        {% else %}
+                                            <p class="text-muted">Click "Analyze My Skills" to see your skill analysis</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Skill Gaps -->
+                        <div class="col-md-6 mb-4">
+                            <div class="card h-100">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fas fa-exclamation-triangle"></i> Skills to Improve
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div id="skill-gaps-container">
+                                        {% if latest_analysis %}
+                                            {% for skill in latest_analysis.skill_gaps|load_json %}
+                                                <span class="badge bg-warning me-1 mb-1">{{ skill }}</span>
+                                            {% endfor %}
+                                        {% else %}
+                                            <p class="text-muted">Analysis will show skills you need to acquire</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Company Matches -->
+                        <div class="col-md-6 mb-4">
+                            <div class="card h-100">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fas fa-building"></i> Best Company Matches
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div id="company-matches-container">
+                                        {% if latest_analysis %}
+                                            {% for company in latest_analysis.recommended_companies|load_json %}
+                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                    <span>{{ company.company }} - {{ company.job_title }}</span>
+                                                    <span class="badge bg-primary">{{ company.match_score }}% match</span>
+                                                </div>
+                                            {% endfor %}
+                                        {% else %}
+                                            <p class="text-muted">Analysis will show companies that match your skills</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Career Suggestions -->
+                        <div class="col-md-6 mb-4">
+                            <div class="card h-100">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fas fa-road"></i> Career Path Suggestions
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div id="career-suggestions-container">
+                                        {% if latest_analysis %}
+                                            {% for suggestion in latest_analysis.career_suggestions|load_json %}
+                                                <div class="mb-3 p-3 border rounded">
+                                                    <h6>{{ suggestion.role }}</h6>
+                                                    <p class="text-muted small">{{ suggestion.reason }}</p>
+                                                    <div class="progress mb-2" style="height: 6px;">
+                                                        <div class="progress-bar bg-success" style="width: {{ suggestion.match_score }}%"></div>
+                                                    </div>
+                                                    <small class="text-primary">{{ suggestion.match_score }}% match</small>
+                                                </div>
+                                            {% endfor %}
+                                        {% else %}
+                                            <p class="text-muted">Analysis will suggest suitable career paths</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dream Company Analysis -->
+                    {% if dream_analysis %}
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header bg-info text-white">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fas fa-star"></i> Dream Company Analysis: {{ dream_analysis.dream_company }}
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="text-center">
+                                                <h3 class="text-primary">{{ dream_analysis.current_match_percentage }}%</h3>
+                                                <p>Current Match</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="text-center">
+                                                <h3 class="text-warning">{{ dream_analysis.timeline_months }}</h3>
+                                                <p>Months to Target</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="text-center">
+                                                <h3 class="text-danger">{{ dream_analysis.skill_gaps|length }}</h3>
+                                                <p>Skills to Learn</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="mt-4">
+                                        <h6>Learning Path:</h6>
+                                        {% for month in dream_analysis.learning_path|load_json %}
+                                            <div class="mb-3">
+                                                <strong>Month {{ month.month }}:</strong>
+                                                {% for skill in month.skills %}
+                                                    <span class="badge bg-secondary me-1">{{ skill }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript for AJAX calls -->
+<script>
+(function() {
+    function getCSRFToken() {
+        const cookieValue = document.cookie.split('; ').find(row => row.startsWith('csrftoken='));
+        return cookieValue ? cookieValue.split('=')[1] : '';
+    }
+
+    const analyzeSkillsBtn = document.getElementById('analyze-skills-btn');
+    const dreamCompanyForm = document.getElementById('dream-company-form');
+    const loadingIndicator = document.getElementById('loading-indicator');
+    const analysisResults = document.getElementById('analysis-results');
+
+    function showLoading() {
+        loadingIndicator.classList.remove('d-none');
+        analysisResults.classList.add('d-none');
+    }
+
+    function hideLoading() {
+        loadingIndicator.classList.add('d-none');
+        analysisResults.classList.remove('d-none');
+    }
+
+    function updateSkillsDisplay(analysis) {
+        const currentSkillsContainer = document.getElementById('current-skills-container');
+        const skillGapsContainer = document.getElementById('skill-gaps-container');
+        const companyMatchesContainer = document.getElementById('company-matches-container');
+        const careerSuggestionsContainer = document.getElementById('career-suggestions-container');
+
+        currentSkillsContainer.innerHTML = analysis.current_skills.map(skill =>
+            `<span class="badge bg-success me-1 mb-1">${skill}</span>`
+        ).join('');
+
+        skillGapsContainer.innerHTML = analysis.skill_gaps.map(skill =>
+            `<span class="badge bg-warning me-1 mb-1">${skill}</span>`
+        ).join('');
+
+        companyMatchesContainer.innerHTML = analysis.top_companies.map(company =>
+            `
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span>${company.company} - ${company.job_title}</span>
+                    <span class="badge bg-primary">${company.match_score}% match</span>
+                </div>
+            `
+        ).join('');
+
+        careerSuggestionsContainer.innerHTML = analysis.career_suggestions.map(suggestion =>
+            `
+                <div class="mb-3 p-3 border rounded">
+                    <h6>${suggestion.role}</h6>
+                    <p class="text-muted small">${suggestion.reason}</p>
+                    <div class="progress mb-2" style="height: 6px;">
+                        <div class="progress-bar bg-success" style="width: ${suggestion.match_score}%"></div>
+                    </div>
+                    <small class="text-primary">${suggestion.match_score}% match</small>
+                </div>
+            `
+        ).join('');
+    }
+
+    function postJson(url, data) {
+        return fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCSRFToken()
+            },
+            body: JSON.stringify(data)
+        }).then(response => response.json());
+    }
+
+    if (analyzeSkillsBtn) {
+        analyzeSkillsBtn.addEventListener('click', function() {
+            showLoading();
+            postJson('/ai/student/analyze-skills/', {})
+                .then(data => {
+                    hideLoading();
+                    if (data.success) {
+                        updateSkillsDisplay(data.analysis);
+                    } else {
+                        alert('Error: ' + (data.error || 'Unknown error'));
+                    }
+                })
+                .catch(() => {
+                    hideLoading();
+                    alert('Analysis failed. Please try again.');
+                });
+        });
+    }
+
+    if (dreamCompanyForm) {
+        dreamCompanyForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const companyName = document.getElementById('dream-company-input').value.trim();
+            if (!companyName) {
+                alert('Please enter a company name');
+                return;
+            }
+            showLoading();
+            postJson('/ai/student/analyze-dream-company/', { dream_company: companyName })
+                .then(data => {
+                    hideLoading();
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Error: ' + (data.error || 'Unknown error'));
+                    }
+                })
+                .catch(() => {
+                    hideLoading();
+                    alert('Analysis failed. Please try again.');
+                });
+        });
+    }
+})();
+</script>
+
+<style>
+.card {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border: none;
+    border-radius: 8px;
+}
+
+.card-header {
+    border-radius: 8px 8px 0 0 !important;
+}
+
+.badge {
+    font-size: 0.8em;
+}
+
+.progress {
+    border-radius: 3px;
+}
+</style>
+{% endblock %}

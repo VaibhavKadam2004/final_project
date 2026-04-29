@@ -158,73 +158,95 @@
                                                 <!-- Update Status Modal Button -->
                                                 <button 
                                                     type="button" 
-                                                    class="btn btn-sm btn-primary" 
+                                                    class="btn btn-sm btn-primary open-update-status-modal" 
                                                     data-bs-toggle="modal" 
-                                                    data-bs-target="#updateStatusModal{{ app.id }}"
+                                                    data-bs-target="#updateStatusModal"
+                                                    data-app-id="{{ app.id }}"
+                                                    data-student-name="{{ app.student.first_name }} {{ app.student.last_name }}"
+                                                    data-current-status="{{ app.status }}"
                                                     style="padding: 4px 8px; font-size: 12px;">
                                                     <i class="fas fa-edit"></i> Update
                                                 </button>
                                             </td>
                                         </tr>
-
-                                        <!-- Update Status Modal -->
-                                        <div class="modal fade" id="updateStatusModal{{ app.id }}" tabindex="-1">
-                                            <div class="modal-dialog">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title">
-                                                            Update Application Status
-                                                        </h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                                    </div>
-                                                    <form method="post">
-                                                        {% csrf_token %}
-                                                        <div class="modal-body">
-                                                            <p style="font-weight: 600; margin-bottom: 10px;">
-                                                                {{ app.student.first_name }} {{ app.student.last_name }}
-                                                            </p>
-                                                            
-                                                            <div class="mb-3">
-                                                                <label for="status{{ app.id }}" class="form-label">New Status</label>
-                                                                <select class="form-select" name="status" id="status{{ app.id }}" required>
-                                                                    <option value="">-- Select Status --</option>
-                                                                    {% for value, label in status_choices %}
-                                                                        <option value="{{ value }}" {% if app.status == value %}selected{% endif %}>
-                                                                            {{ label }}
-                                                                        </option>
-                                                                    {% endfor %}
-                                                                </select>
-                                                            </div>
-                                                            
-                                                            <div class="mb-3">
-                                                                <label for="note{{ app.id }}" class="form-label">Add Note (Optional)</label>
-                                                                <textarea 
-                                                                    class="form-control" 
-                                                                    name="note" 
-                                                                    id="note{{ app.id }}"
-                                                                    rows="3"
-                                                                    placeholder="E.g., Selected for technical round, Failed coding test, etc.">
-                                                                </textarea>
-                                                                <small class="form-text text-muted">
-                                                                    Add a note about why you're changing the status (e.g., interview round, reason for rejection)
-                                                                </small>
-                                                            </div>
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                            <input type="hidden" name="app_id" value="{{ app.id }}">
-                                                            <button type="submit" class="btn btn-primary">
-                                                                <i class="fas fa-save"></i> Update Status
-                                                            </button>
-                                                        </div>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </div>
                                     {% endfor %}
                                 </tbody>
                             </table>
                         </div>
+
+                        <div class="modal fade" id="updateStatusModal" tabindex="-1">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">
+                                            Update Application Status
+                                        </h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <form method="post" action="{% url 'recruiter_applications' job.id %}">
+                                        {% csrf_token %}
+                                        <div class="modal-body">
+                                            <p id="updateStatusStudentName" style="font-weight: 600; margin-bottom: 10px;"></p>
+
+                                            <div class="mb-3">
+                                                <label for="statusSelect" class="form-label">New Status</label>
+                                                <select class="form-select" name="status" id="statusSelect" required>
+                                                    <option value="">-- Select Status --</option>
+                                                    {% for value, label in status_choices %}
+                                                        <option value="{{ value }}">{{ label }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                            
+                                            <div class="mb-3">
+                                                <label for="noteText" class="form-label">Add Note (Optional)</label>
+                                                <textarea 
+                                                    class="form-control" 
+                                                    name="note" 
+                                                    id="noteText"
+                                                    rows="3"
+                                                    placeholder="E.g., Selected for technical round, Failed coding test, etc."></textarea>
+                                                <small class="form-text text-muted">
+                                                    Add a note about why you're changing the status (e.g., interview round, reason for rejection)
+                                                </small>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                            <input type="hidden" name="app_id" id="appIdInput">
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="fas fa-save"></i> Update Status
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function () {
+                                var statusModal = document.getElementById('updateStatusModal');
+                                if (!statusModal) return;
+
+                                statusModal.addEventListener('show.bs.modal', function (event) {
+                                    var button = event.relatedTarget;
+                                    var appId = button.getAttribute('data-app-id');
+                                    var studentName = button.getAttribute('data-student-name');
+                                    var currentStatus = button.getAttribute('data-current-status');
+
+                                    document.getElementById('appIdInput').value = appId;
+                                    document.getElementById('updateStatusStudentName').textContent = studentName;
+
+                                    var select = document.getElementById('statusSelect');
+                                    select.value = currentStatus || '';
+                                    if (!select.value) {
+                                        select.selectedIndex = 0;
+                                    }
+                                    document.getElementById('noteText').value = '';
+                                });
+                            });
+                        </script>
+
                     {% else %}
                         <div style="text-align: center; padding: 40px; color: #6b7280;">
                             <i class="fas fa-inbox" style="font-size: 40px; color: #d1d5db; margin-bottom: 15px; display: block;"></i>

@@ -7,6 +7,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('accounts.urls')),
     path('jobs/', include('jobs.urls')),
+    path('ai/', include('ai_analytics.urls')),  # Re-enabled after sklearn installation
 ]
 
 if settings.DEBUG:

@@ -25,7 +25,7 @@ class CustomUser(AbstractUser):
 
     @property
     def is_tpo(self):
-        return self.role_type == self.TPO
+        return self.role_type == self.TPO or self.is_superuser
 
 class StudentProfile(models.Model):
     """Student Profile - Tracks academic details and verification status"""
